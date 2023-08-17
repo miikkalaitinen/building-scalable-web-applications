@@ -1,34 +1,36 @@
-import { connect } from '../deps.js'
+import { connect } from "../deps.js";
 
 const redis = await connect({
-  hostname: 'redis',
+  hostname: "redis",
   port: 6379,
-})
+});
 
 const cacheMethodCalls = (object, methodsToFlushCacheWith = []) => {
   const handler = {
     get: (module, methodName) => {
-      const method = module[methodName]
+      console.log("GET", module, methodName)
+      const method = module[methodName];
+      console.log("METHOD", method)
       return async (...methodArgs) => {
         if (methodsToFlushCacheWith.includes(methodName)) {
           await redis.flushdb()
-          return await method.apply(this, methodArgs)
+          return await method.apply(this, methodArgs);
         }
 
-        const cacheKey = `${methodName}-${JSON.stringify(methodArgs)}`
-        const cacheResult = await redis.get(cacheKey)
+        const cacheKey = `${methodName}-${JSON.stringify(methodArgs)}`;
+        const cacheResult = await redis.get(cacheKey);
         if (!cacheResult) {
-          const result = await method.apply(this, methodArgs)
-          await redis.set(cacheKey, JSON.stringify(result))
-          return result
+          const result = await method.apply(this, methodArgs);
+          await redis.set(cacheKey, JSON.stringify(result));
+          return result;
         }
 
-        return JSON.parse(cacheResult)
-      }
+        return JSON.parse(cacheResult);
+      };
     },
-  }
+  };
 
-  return new Proxy(object, handler)
-}
+  return new Proxy(object, handler);
+};
 
-export { cacheMethodCalls }
+export { cacheMethodCalls };
