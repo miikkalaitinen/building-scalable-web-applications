@@ -2,3 +2,4 @@ project.env
 app-cache/
 todo-ui/.vscode/
 todo-ui/node_modules/
+.DS_Store
