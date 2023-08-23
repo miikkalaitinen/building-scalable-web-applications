@@ -11,7 +11,7 @@ const getTodos = async () => {
 }
 
 const addTodo = async (item) => {
-  return await sql`INSERT INTO todos (item) VALUES (${item})`
+  return await sql`INSERT INTO todos (item) VALUES (${item}) RETURNING id, item`
 }
 
 const deleteTodoById = async (id) => {

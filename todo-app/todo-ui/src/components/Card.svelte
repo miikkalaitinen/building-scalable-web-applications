@@ -1,4 +1,58 @@
-<div class="h-48 w-72 bg-red-300 rounded">
-  <h2 class="mx-2 p-2 first-letter text-4xl">Card</h2>
-  <p class="mx-4 px-4 pt-2">Description</p>
-</div>
+<script>
+  export let todo;
+  export let onDelete;
+</script>
+<li class="link-card">
+  <h2>
+    {todo.item}
+  </h2>
+  <!-- Delete button -->
+  <button on:click={onDelete}>X</button>
+</li>
+<style>
+  button {
+    background: none;
+    color: inherit;
+    border: none;
+    cursor: pointer;
+  }
+  .link-card {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem;
+    background-color: white;
+    background-image: none;
+    background-size: 400%;
+    border-radius: 0.6rem;
+    background-position: 100%;
+    transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
+
+  .link-card {
+    margin: 0 2em;
+    text-decoration: none;
+    padding: 1rem 1.3rem;
+    border-radius: 0.35rem;
+    color: #111;
+    background-color: white;
+    opacity: 0.8;
+  }
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  p {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    color: #444;
+  }
+  .link-card:is(:hover, :focus-within) {
+    background-position: 0;
+    background-image: var(--accent-gradient);
+    color: white;
+  }
+</style>
