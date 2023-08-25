@@ -1,4 +1,4 @@
-FROM lukechannings/deno:v1.29.2
+FROM denoland/deno:alpine-1.31.0
 
 EXPOSE 7000
 
@@ -15,4 +15,4 @@ RUN deno cache deps.js
 
 COPY . .
 
-CMD [ "run", "--unstable", "--watch", "--allow-all", "app.js" ]
+CMD [ "run", "--unstable", "--allow-all", "app.js" ]
