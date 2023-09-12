@@ -1,4 +1,4 @@
-version: "3.4"
+version: '3.4'
 
 volumes:
   astro_node_modules:
@@ -17,7 +17,7 @@ services:
   programming-api:
     build: programming-api
     image: programming-api
-    restart: "no"
+    restart: 'no'
     volumes:
       - ./programming-api/:/app
       - ./app-cache/:/app-cache
@@ -32,7 +32,7 @@ services:
   programming-ui:
     build: programming-ui
     image: programming-ui
-    restart: "no"
+    restart: 'no'
     volumes:
       - ./programming-ui/:/app
       - astro_node_modules:/app/node_modules
@@ -44,18 +44,18 @@ services:
   grader-api:
     build: grader-api
     image: grader-api
-    restart: "no"
+    restart: 'no'
     volumes:
       - ./grader-api/:/app
       - ./app-cache/:/app-cache
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - '/var/run/docker.sock:/var/run/docker.sock'
     expose:
       - 7000
 
   database:
     container_name: database-server-dab-p1-56a1311e-df76-4b02-8db8-99f2bd86fafa
     image: postgres:14.1
-    restart: "no"
+    restart: 'no'
     env_file:
       - project.env
 
@@ -70,7 +70,7 @@ services:
       - project.env
 
   e2e-playwright:
-    entrypoint: "/bin/true"
+    entrypoint: '/bin/true'
     build: e2e-playwright
     image: e2e-playwright
     network_mode: host
