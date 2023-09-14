@@ -45,6 +45,7 @@ services:
     build: grader-api
     image: grader-api
     restart: 'no'
+    hostname: grader-api-{.Task.Slot}}
     volumes:
       - ./grader-api/:/app
       - ./app-cache/:/app-cache
@@ -58,6 +59,14 @@ services:
     restart: 'no'
     env_file:
       - project.env
+
+  redis:
+    image: redis:latest
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    expose:
+      - 6379
 
   flyway:
     image: flyway/flyway:9.11.0-alpine

@@ -2,16 +2,13 @@ import * as programmingAssignmentService from './services/programmingAssignmentS
 import * as gradingQueueService from './services/gradingQueueService.js'
 import { serve } from './deps.js'
 
-export let controllers = new Set()
+export let sockets = new Set()
 
-// Handle new submission POST request
 const handlePost = async (request) => {
   try {
-    // Data from the request body
     const { code, assignment_id } = await request.json()
     const userId = request.headers.get('X-User-Id')
 
-    // Check if the user has already submitted the same code for the same assignment
     const matchingSubmission =
       await programmingAssignmentService.findMatchingSubmission(
         assignment_id,
@@ -22,50 +19,37 @@ const handlePost = async (request) => {
       return new Response(JSON.stringify(matchingSubmission), { status: 200 })
     }
 
-    // If not, Insert the submission to the database
+    if (gradingQueueService.user_queue.has(userId)) {
+      return new Response('Already in queue', { status: 200 })
+    }
+
     const submission = await programmingAssignmentService.insertNewSubmission(
       userId,
       code,
       assignment_id
     )
 
-    // Add the submission to the grading queue
     gradingQueueService.sendToQueue(submission)
-
-    // Return the submission
-    return new Response(JSON.stringify(submission), { status: 200 })
+    return Response.json(submission)
   } catch (e) {
     console.log(e)
     return new Response(e, { status: 500 })
   }
 }
 
-// Open datastream to the client to handle real time updates
 const handleStatus = async (request, urlPatternResult) => {
-  let controller
   const id = urlPatternResult.pathname.groups.id
+  const { socket, response } = Deno.upgradeWebSocket(request)
 
-  const body = new ReadableStream({
-    start(c) {
-      controller = c
-      controllers.add({ controller: controller, submissionId: id })
-    },
-    cancel() {
-      controllers.delete({ controller: controller, submissionId: id })
-    },
-  })
+  sockets.add({ socket, id })
 
-  console.log('New client connected')
-  return new Response(body, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Access-Control-Allow-Origin': '*',
-      Connection: 'keep-alive',
-    },
-  })
+  socket.onclose = () => {
+    sockets.delete({ socket, id })
+  }
+
+  return response
 }
 
-// Handle GET request for the first undone assignment
 const handleGetFirstUndone = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')

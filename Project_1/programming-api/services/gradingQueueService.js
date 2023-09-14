@@ -1,59 +1,33 @@
-import { controllers } from '../app.js'
-const encoder = new TextEncoder()
+import { sockets } from '../app.js'
+import { createClient } from 'npm:redis@4.6.4'
 
-const sendToQueue = async (submission, code, assignmentId) => {
-  // Somehow add the submission to the queue
-  // ...
+export let user_queue = new Set()
+export let graderIds = []
 
-  // Return the graded sumbission after it has been graded
+const client = createClient({
+  url: 'redis://redis:6379',
+  pingInterval: 1000,
+})
 
-  await new Promise(() =>
-    setTimeout(() => {
-      const gradedSubmission = {
-        id: submission.id,
-        user_uuid: submission.user_uuid,
-        code: submission.code,
-        programming_assignment_id: submission.programming_assignment_id,
-        status: 'graded',
-        grader_feedback: 'Good job!',
-        correct: true,
-      }
-      console.log(controllers)
-      controllers.forEach((c) => {
-        if (c.submissionId == submission.id) {
-          console.log(
-            'Sending graded submission to client with submission id: ' +
-              submission.id
-          )
-          c.controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(gradedSubmission)}\n\n`)
-          )
-          c.controller.close()
-          controllers.delete(c)
-        }
-      })
-    }, 5000)
-  )
+await client.connect()
+
+const sendToQueue = (submission) => {
+  user_queue.add(submission.user_uuid)
+  sendSubmissionToRedisStream(submission)
 }
 
-const sendToGrader = async (code, assignmentId) => {
-  const testCode = await database.getTestCode(assignmentId)
-  if (!testCode[0]) {
-    throw new Error('Test code not found')
+const sendSubmissionToRedisStream = (submission) => {
+  const redisObject = {}
+
+  for (const key in submission) {
+    redisObject[key] = String(submission[key])
   }
-
-  const response = await fetch('http://grader-api:7000/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      testCode: testCode[0].test_code,
-      code: code,
-    }),
+  client.xAdd('gradingQueue', '*', redisObject)
+  sockets.forEach(({ socket, id }) => {
+    if (id == submission.id) {
+      socket.send(JSON.stringify({ status: 'queued' }))
+    }
   })
-
-  return response
 }
 
 const parseGraderResponse = async (response) => {

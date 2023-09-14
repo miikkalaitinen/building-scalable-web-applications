@@ -1,13 +1,16 @@
 <script>
   import { userUuid } from "../stores/stores.js";
   import { onMount } from "svelte";
+  import Feedback from "./Feedback.svelte";
 
   let title = "";
   let handout = "";
   let id = 0;
   let submission = "";
 
-  let eventSource;
+  let submission_status;
+
+  let webSocket;
 
   const postSubmission = async () => {
     const response = await fetch("/api/assignments/submit", {
@@ -19,17 +22,10 @@
     });
     const data = await response.json();
 
-    eventSource = new EventSource(`/api/assignments/status/${data.id}`)
-    
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data);
-    };
-
-    return () => {
-      if (eventSource.readyState === 1) {
-        eventSource.close();
-      }
+    const host = window.location.hostname;
+    webSocket = new WebSocket(`ws://${host}:7800/api/assignments/status/${data.id}`);
+    webSocket.onmessage = (event) => {
+      console.log(event.data);
     };
   };
 
@@ -64,9 +60,14 @@
 <p>{handout || "Loading"}</p>
 
 <textarea id="textbox" bind:value={submission} class="w-full h-64 border-2 border-gray-300 rounded-md p-2"></textarea>
-<button
-  class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
-  on:click={postSubmission}
->
- Grade my code
-</button>
+
+{#if submission_status}
+  <Feedback {submission_status} />
+{:else}
+  <button
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+    on:click={postSubmission}
+  >
+   Grade my code
+  </button>
+{/if}
