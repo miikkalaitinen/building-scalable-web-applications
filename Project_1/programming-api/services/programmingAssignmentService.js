@@ -1,53 +1,46 @@
-import { sql } from '../database/database.js'
+import * as database from '../database/database.js'
 
-const findAll = async () => {
-  return await sql`SELECT * FROM programming_assignments;`
+const findMatchingSubmission = async (assignmentId, studentId, code) => {
+  const matchingSubmissions = await database.findMatching(
+    studentId,
+    code,
+    assignmentId
+  )
+
+  if (matchingSubmissions[0]) {
+    console.log('Found matching submission')
+    return matchingSubmissions[0]
+  } else return null
 }
 
-const findMatching = async (user_uuid, code, assignment_id) => {
-  return await sql`SELECT status, grader_feedback, correct FROM programming_assignment_submissions 
-  WHERE user_uuid = ${user_uuid} 
-  AND code = ${code} 
-  AND programming_assignment_id = ${assignment_id};`
+const insertNewSubmission = async (studentId, code, assignmentId) => {
+  const submission = await database.addSubmission(studentId, code, assignmentId)
+  return submission[0]
 }
 
-const getTestCode = async (assignment_id) => {
-  return await sql`
-  SELECT test_code
-  FROM programming_assignments
-  WHERE id = ${assignment_id};
-  `
+const updateSubmission = async (submissionId, feedback, correct) => {
+  console.log(submissionId, feedback, correct)
+  const updatedSubmission = await database.updateSubmission(
+    submissionId,
+    'processed',
+    feedback,
+    correct
+  )
+  const submission = updatedSubmission[0]
+  return submission
 }
 
-const firstUndone = async (user_uuid) => {
-  return await sql`
-  SELECT title, handout, id
-  FROM programming_assignments
-  WHERE assignment_order = (
-    SELECT MIN(assignment_order)
-    FROM programming_assignments
-    WHERE id NOT IN (
-      SELECT programming_assignment_id
-      FROM programming_assignment_submissions
-      WHERE user_uuid = ${user_uuid}
-    )
-  );
-  `
+// Get the first undone assignment for a student
+const getFirstUndone = async (studentId) => {
+  const undoneAssignment = await database.firstUndone(studentId)
+  if (!undoneAssignment[0]) {
+    return false
+  } else return undoneAssignment[0]
 }
 
-const addSubmission = async (
-  user_uuid,
-  code,
-  assignment_id,
-  submission_status,
-  grader_feedback,
-  correct
-) => {
-  return await sql`
-  INSERT INTO programming_assignment_submissions (user_uuid, code, programming_assignment_id, submission_status, grader_feedback, correct)
-  VALUES (${user_uuid}, ${code}, ${assignment_id}, ${submission_status}, ${grader_feedback}, ${correct})
-  RETURNING *;
-  `
+export {
+  findMatchingSubmission,
+  insertNewSubmission,
+  getFirstUndone,
+  updateSubmission,
 }
-
-export { findAll, firstUndone, getTestCode, findMatching }

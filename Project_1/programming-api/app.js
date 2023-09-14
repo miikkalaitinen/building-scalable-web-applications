@@ -1,65 +1,85 @@
 import * as programmingAssignmentService from './services/programmingAssignmentService.js'
+import * as gradingQueueService from './services/gradingQueueService.js'
 import { serve } from './deps.js'
-import { sql } from './database/database.js'
 
+export let controllers = new Set()
+
+// Handle new submission POST request
 const handlePost = async (request) => {
-  const { code, assignment_id } = await request.json()
-  const userId = request.headers.get('X-User-Id')
+  try {
+    // Data from the request body
+    const { code, assignment_id } = await request.json()
+    const userId = request.headers.get('X-User-Id')
 
-  // Check if the user has already submitted the same code for the same assignment
-  const matchingSubmissions = await programmingAssignmentService.findMatching(
-    userId,
-    code,
-    assignment_id
-  )
-  if (matchingSubmissions[0]) {
-    return new Response(JSON.stringify(matchingSubmissions[0]), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    // Check if the user has already submitted the same code for the same assignment
+    const matchingSubmission =
+      await programmingAssignmentService.findMatchingSubmission(
+        assignment_id,
+        userId,
+        code
+      )
+    if (matchingSubmission) {
+      return new Response(JSON.stringify(matchingSubmission), { status: 200 })
+    }
+
+    // If not, Insert the submission to the database
+    const submission = await programmingAssignmentService.insertNewSubmission(
+      userId,
+      code,
+      assignment_id
+    )
+
+    // Add the submission to the grading queue
+    gradingQueueService.sendToQueue(submission)
+
+    // Return the submission
+    return new Response(JSON.stringify(submission), { status: 200 })
+  } catch (e) {
+    console.log(e)
+    return new Response(e, { status: 500 })
   }
-
-  // Send the code to the grader
-  const testCode = await programmingAssignmentService.getTestCode(assignment_id)
-  const data = {
-    testCode: testCode,
-    code: code,
-  }
-
-  const response = await fetch('http://grader-api:7000/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-
-  // Save the submission to the database
-
-  const graderResponse = await response.json()
-
-  const result = await programmingAssignmentService.addSubmission(
-    user_uuid,
-    code,
-    assignment_id,
-    submission_status,
-    grader_feedback,
-    correct
-  )
-
-  return new Response(JSON.stringify(result[0]), { status: 404 })
 }
 
-const handleGetFirstUndone = async (request) => {
-  const userId = request.headers.get('X-User-Id')
-  const undoneAssignment = await programmingAssignmentService.firstUndone(
-    userId
-  )
-  if (!undoneAssignment[0]) {
-    return new Response('Not found', { status: 404 })
-  }
-  return new Response(JSON.stringify(undoneAssignment[0]), {
-    headers: { 'Content-Type': 'application/json' },
+// Open datastream to the client to handle real time updates
+const handleStatus = async (request, urlPatternResult) => {
+  let controller
+  const id = urlPatternResult.pathname.groups.id
+
+  const body = new ReadableStream({
+    start(c) {
+      controller = c
+      controllers.add({ controller: controller, submissionId: id })
+    },
+    cancel() {
+      controllers.delete({ controller: controller, submissionId: id })
+    },
   })
+
+  console.log('New client connected')
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Access-Control-Allow-Origin': '*',
+      Connection: 'keep-alive',
+    },
+  })
+}
+
+// Handle GET request for the first undone assignment
+const handleGetFirstUndone = async (request) => {
+  try {
+    const userId = await request.headers.get('X-User-Id')
+    const assignment = await programmingAssignmentService.getFirstUndone(userId)
+    if (!assignment) {
+      return new Response('No undone assignments', { status: 404 })
+    }
+    return new Response(JSON.stringify(assignment), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (error) {
+    console.log(error)
+    return new Response(error, { status: 500 })
+  }
 }
 
 const urlMapping = [
@@ -67,6 +87,11 @@ const urlMapping = [
     method: 'GET',
     pattern: new URLPattern({ pathname: '/assignments/undone' }),
     fn: handleGetFirstUndone,
+  },
+  {
+    method: 'GET',
+    pattern: new URLPattern({ pathname: '/assignments/status/:id' }),
+    fn: handleStatus,
   },
   {
     method: 'POST',

@@ -7,6 +7,8 @@
   let id = 0;
   let submission = "";
 
+  let eventSource;
+
   const postSubmission = async () => {
     const response = await fetch("/api/assignments/submit", {
       method: "POST",
@@ -16,11 +18,22 @@
       body: JSON.stringify({ code: submission, assignment_id: id })
     });
     const data = await response.json();
-    console.log(data);
+
+    eventSource = new EventSource(`/api/assignments/status/${data.id}`)
+    
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data);
+    };
+
+    return () => {
+      if (eventSource.readyState === 1) {
+        eventSource.close();
+      }
+    };
   };
 
   onMount(async () => {
-    
     const response = await fetch("/api/assignments/undone", {
       method: "GET",
       headers: {
