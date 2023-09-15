@@ -1,4 +1,5 @@
 const parseGraderResponse = async (result) => {
+  console.log(result)
   if (result.startsWith('Traceback')) {
     return {
       status: 'error',
@@ -19,7 +20,7 @@ const parseGraderResponse = async (result) => {
     }
   } else {
     return {
-      status: 'error',
+      status: 'gradererror',
       correct: false,
       feedback: 'Unhandled error in grader-image',
     }
