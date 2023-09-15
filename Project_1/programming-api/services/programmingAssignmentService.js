@@ -10,7 +10,8 @@ const findMatchingSubmission = async (assignmentId, studentId, code) => {
   if (matchingSubmissions[0]) {
     console.log('Found matching submission')
     return matchingSubmissions[0]
-  } else return null
+  }
+  return null
 }
 
 const insertNewSubmission = async (studentId, code, assignmentId) => {
@@ -34,8 +35,17 @@ const updateSubmission = async (submissionId, feedback, correct) => {
 const getFirstUndone = async (studentId) => {
   const undoneAssignment = await database.firstUndone(studentId)
   if (!undoneAssignment[0]) {
-    return false
-  } else return undoneAssignment[0]
+    return null
+  }
+  return undoneAssignment[0]
+}
+
+const getTestCode = async (assignment_id) => {
+  const testCode = await database.getTestCode(assignment_id)
+  if (!testCode[0]) {
+    return null
+  }
+  return testCode[0].test_code
 }
 
 export {
@@ -43,4 +53,5 @@ export {
   insertNewSubmission,
   getFirstUndone,
   updateSubmission,
+  getTestCode,
 }

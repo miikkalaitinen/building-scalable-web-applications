@@ -23,13 +23,21 @@ const handlePost = async (request) => {
       return new Response('Already in queue', { status: 200 })
     }
 
+    const test_code = await programmingAssignmentService.getTestCode(
+      assignment_id
+    )
+
+    if (!test_code) {
+      return new Response('No test code found', { status: 500 })
+    }
+
     const submission = await programmingAssignmentService.insertNewSubmission(
       userId,
       code,
       assignment_id
     )
 
-    gradingQueueService.sendToQueue(submission)
+    gradingQueueService.sendToQueue(submission, test_code)
     return Response.json(submission)
   } catch (e) {
     console.log(e)
@@ -66,6 +74,33 @@ const handleGetFirstUndone = async (request) => {
   }
 }
 
+const handlePostFeedback = async (request, urlPatternResult) => {
+  try {
+    const id = urlPatternResult.pathname.groups.id
+    const result = await request.json()
+    await gradingQueueService.user_queue.delete(result.user_uuid)
+
+    const response = await programmingAssignmentService.updateSubmission(
+      result.submissionId,
+      result.feedback,
+      result.correct
+    )
+
+    sockets.forEach(({ socket, id }) => {
+      if (id == result.submissionId) {
+        socket.send(JSON.stringify({ test_status: result.status, ...response }))
+        socket.close()
+        sockets.delete({ socket, id })
+      }
+    })
+
+    return new Response('OK', { status: 200 })
+  } catch (error) {
+    console.log(error)
+    return new Response(error, { status: 500 })
+  }
+}
+
 const urlMapping = [
   {
     method: 'GET',
@@ -76,6 +111,11 @@ const urlMapping = [
     method: 'GET',
     pattern: new URLPattern({ pathname: '/assignments/status/:id' }),
     fn: handleStatus,
+  },
+  {
+    method: 'POST',
+    pattern: new URLPattern({ pathname: '/feedback/:id' }),
+    fn: handlePostFeedback,
   },
   {
     method: 'POST',

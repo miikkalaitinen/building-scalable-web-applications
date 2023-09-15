@@ -11,38 +11,20 @@ const client = createClient({
 
 await client.connect()
 
-const sendToQueue = (submission) => {
+const sendToQueue = (submission, test_code) => {
   user_queue.add(submission.user_uuid)
-  sendSubmissionToRedisStream(submission)
+  sendSubmissionToRedisStream(submission, test_code)
 }
 
-const sendSubmissionToRedisStream = (submission) => {
-  const redisObject = {}
-
-  for (const key in submission) {
-    redisObject[key] = String(submission[key])
+const sendSubmissionToRedisStream = (submission, test_code) => {
+  const redisObject = {
+    submissionId: String(submission.id),
+    user_uuid: submission.user_uuid,
+    code: submission.code,
+    testCode: test_code,
   }
+
   client.xAdd('gradingQueue', '*', redisObject)
-  sockets.forEach(({ socket, id }) => {
-    if (id == submission.id) {
-      socket.send(JSON.stringify({ status: 'queued' }))
-    }
-  })
-}
-
-const parseGraderResponse = async (response) => {
-  const result = (await response.json()).result
-  if (result.charAt(0) == '.') {
-    return {
-      result,
-      correct: true,
-    }
-  } else {
-    return {
-      result,
-      correct: false,
-    }
-  }
 }
 
 export { sendToQueue }

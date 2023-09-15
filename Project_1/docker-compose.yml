@@ -26,6 +26,7 @@ services:
     depends_on:
       - database
       - flyway
+      - redis
     env_file:
       - project.env
 
@@ -45,13 +46,18 @@ services:
     build: grader-api
     image: grader-api
     restart: 'no'
-    hostname: grader-api-{.Task.Slot}}
+    depends_on:
+      - database
+      - flyway
+      - redis
     volumes:
       - ./grader-api/:/app
       - ./app-cache/:/app-cache
       - '/var/run/docker.sock:/var/run/docker.sock'
     expose:
       - 7000
+    deploy:
+      replicas: 2
 
   database:
     container_name: database-server-dab-p1-56a1311e-df76-4b02-8db8-99f2bd86fafa
