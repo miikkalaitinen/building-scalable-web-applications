@@ -83,7 +83,7 @@ services:
         window: '30s'
 
   database:
-    container_name: database-server-dab-p1-56a1311e-df76-4b02-8db8-99f2bd86fafa
+    container_name: database
     image: postgres:14.1
     restart: 'no'
     env_file:
