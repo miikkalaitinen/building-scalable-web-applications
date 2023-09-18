@@ -12,16 +12,13 @@ while (true) {
 
     const response = await parseGraderResponse(result)
 
-    await fetch(
-      `http://programming-api:7777/feedback/${submission.submissionId}`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          submissionId: submission.submissionId,
-          user_uuid: submission.user_uuid,
-          ...response,
-        }),
-      }
-    )
+    await fetch('http://programming-api:7777/grader', {
+      method: 'POST',
+      body: JSON.stringify({
+        submissionId: submission.submissionId,
+        user_uuid: submission.user_uuid,
+        ...response,
+      }),
+    })
   }
 }

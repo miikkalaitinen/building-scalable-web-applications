@@ -74,9 +74,8 @@ const handleGetFirstUndone = async (request) => {
   }
 }
 
-const handlePostFeedback = async (request, urlPatternResult) => {
+const handlePostFeedback = async (request) => {
   try {
-    const id = urlPatternResult.pathname.groups.id
     const result = await request.json()
     await gradingQueueService.user_queue.delete(result.user_uuid)
 
@@ -114,7 +113,7 @@ const urlMapping = [
   },
   {
     method: 'POST',
-    pattern: new URLPattern({ pathname: '/feedback/:id' }),
+    pattern: new URLPattern({ pathname: '/grader' }),
     fn: handlePostFeedback,
   },
   {
