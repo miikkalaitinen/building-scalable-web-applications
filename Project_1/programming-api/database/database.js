@@ -58,7 +58,7 @@ const updateSubmission = async (id, status, grader_feedback, correct) => {
 }
 
 const removeUserAssignments = async (id) => {
-  return await sql`
+  await sql`
   DELETE FROM programming_assignment_submissions
   WHERE user_uuid = ${id};`
 }

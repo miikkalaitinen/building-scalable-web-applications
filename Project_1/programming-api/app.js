@@ -1,6 +1,5 @@
 import * as programmingAssignmentService from './services/programmingAssignmentService.js'
 import * as gradingQueueService from './services/gradingQueueService.js'
-import * as databse from './database/database.js'
 import { serve } from './deps.js'
 
 export let sockets = new Set()
@@ -62,7 +61,7 @@ const handleStatus = async (request, urlPatternResult) => {
 const handleResetAssignments = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')
-    await databse.removeUserAssignments(userId)
+    await programmingAssignmentService.removeUserAssignments(userId)
     return new Response('OK', { status: 200 })
   } catch (error) {
     console.log(error)

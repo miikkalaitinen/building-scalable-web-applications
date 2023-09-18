@@ -27,13 +27,17 @@ const insertNewSubmission = async (studentId, code, assignmentId) => {
 }
 
 const updateSubmission = async (submissionId, feedback, correct) => {
-  console.log(submissionId, feedback, correct)
+  if (correct) {
+    await client.del(`user_points_${userId[0].user_uuid}`)
+  }
+
   const updatedSubmission = await database.updateSubmission(
     submissionId,
     'processed',
     feedback,
     correct
   )
+
   const submission = updatedSubmission[0]
   return submission
 }
@@ -76,6 +80,12 @@ const getUserPoints = async (studentId) => {
   return points
 }
 
+const removeUserAssignments = async (studentId) => {
+  await database.removeUserAssignments(studentId)
+  await client.del(`user_points_${studentId}`)
+  return true
+}
+
 export {
   findMatchingSubmission,
   insertNewSubmission,
@@ -83,4 +93,5 @@ export {
   updateSubmission,
   getTestCode,
   getUserPoints,
+  removeUserAssignments,
 }
