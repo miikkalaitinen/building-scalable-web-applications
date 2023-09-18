@@ -33,6 +33,11 @@
     });
     const data = await response.json();
 
+    if (response.status === 500) {
+      alert("Something went wrong, please restart the application");
+      return;
+    }
+
     // Check if the submission was processed immediately from database
     if (data.status === "processed") {
       submission_status = data;
@@ -63,6 +68,9 @@
     // If no more assignments, set allDone to true
     if (response.status === 204) {
       allDone = true;
+      return;
+    } else if (response.status === 500) {
+      alert("Something went wrong, please restart the application");
       return;
     }
 
