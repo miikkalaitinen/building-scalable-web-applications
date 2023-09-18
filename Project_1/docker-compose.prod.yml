@@ -83,7 +83,7 @@ services:
         window: '30s'
 
   database:
-    container_name: database
+    container_name: database-server-dab-p1-56a1311e-df76-4b02-8db8-99f2bd86fafa
     image: postgres:14.1
     restart: 'no'
     env_file:
@@ -106,6 +106,8 @@ services:
     command: -connectRetries=60 -baselineOnMigrate=true migrate
     env_file:
       - project.env
+    profiles:
+      - migrate
 
   e2e-playwright:
     entrypoint: '/bin/true'
@@ -116,3 +118,5 @@ services:
       - nginx
     volumes:
       - ./e2e-playwright/tests:/e2e-playwright/tests
+    profiles:
+      - e2e
