@@ -27,10 +27,6 @@ const insertNewSubmission = async (studentId, code, assignmentId) => {
 }
 
 const updateSubmission = async (submissionId, feedback, correct) => {
-  if (correct) {
-    await client.del(`user_points_${userId[0].user_uuid}`)
-  }
-
   const updatedSubmission = await database.updateSubmission(
     submissionId,
     'processed',
@@ -38,8 +34,13 @@ const updateSubmission = async (submissionId, feedback, correct) => {
     correct
   )
 
-  const submission = updatedSubmission[0]
-  return submission
+  const { user_uuid, ...rest } = updatedSubmission[0]
+
+  if (correct) {
+    await client.del(`user_points_${user_uuid}`)
+  }
+
+  return rest
 }
 
 // Get the first undone assignment for a student

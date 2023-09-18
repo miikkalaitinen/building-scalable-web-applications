@@ -53,7 +53,7 @@ const updateSubmission = async (id, status, grader_feedback, correct) => {
   return await sql`
   UPDATE programming_assignment_submissions
   SET status = ${status}, grader_feedback = ${grader_feedback}, correct = ${correct}
-  WHERE id = ${id} RETURNING status, grader_feedback, correct;
+  WHERE id = ${id} RETURNING status, grader_feedback, correct, user_uuid;
   `
 }
 
