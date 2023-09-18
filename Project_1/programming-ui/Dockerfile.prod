@@ -16,7 +16,7 @@ FROM nginx:latest as server
 
 EXPOSE 3000
 
-COPY programming.ui.nginx.prod.conf /etc/nginx/nginx.conf
+COPY programming-ui.nginx.prod.conf /etc/nginx/nginx.conf
 
 COPY --from=build /app/dist /usr/share/nginx/html
 
