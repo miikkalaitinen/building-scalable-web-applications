@@ -5,7 +5,6 @@
 {#if submission_status.status == "pending"}
 <div class={`rounded-md h-96 p-12 bg-slate-200`}>
   <h2>
-    w
     In grading...
   </h2>
 </div>
