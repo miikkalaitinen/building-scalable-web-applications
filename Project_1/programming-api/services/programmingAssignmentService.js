@@ -1,5 +1,5 @@
 import * as database from '../database/database.js'
-import { createClient } from 'npm:redis@4.6.4'
+import { createClient } from '../deps.js'
 
 const client = createClient({
   url: 'redis://redis:6379',

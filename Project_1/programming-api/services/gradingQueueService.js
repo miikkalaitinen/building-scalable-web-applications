@@ -1,4 +1,4 @@
-import { createClient } from 'npm:redis@4.6.4'
+import { createClient } from '../deps.js'
 
 export let user_queue = new Set()
 export let graderIds = []
