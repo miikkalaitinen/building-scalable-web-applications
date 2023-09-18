@@ -56,10 +56,10 @@ const updateSubmission = async (id, status, grader_feedback, correct) => {
   `
 }
 
-const deleteSubmission = async (id) => {
+const removeUserAssignments = async (id) => {
   return await sql`
   DELETE FROM programming_assignment_submissions
-  WHERE id = ${id};`
+  WHERE user_uuid = ${id};`
 }
 
 export {
@@ -68,6 +68,6 @@ export {
   findMatching,
   addSubmission,
   updateSubmission,
-  deleteSubmission,
+  removeUserAssignments,
   findUserPoints,
 }

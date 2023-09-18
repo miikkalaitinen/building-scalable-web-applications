@@ -1,5 +1,6 @@
 import * as programmingAssignmentService from './services/programmingAssignmentService.js'
 import * as gradingQueueService from './services/gradingQueueService.js'
+import * as databse from './database/database.js'
 import { serve } from './deps.js'
 
 export let sockets = new Set()
@@ -58,12 +59,23 @@ const handleStatus = async (request, urlPatternResult) => {
   return response
 }
 
+const handleResetAssignments = async (request) => {
+  try {
+    const userId = await request.headers.get('X-User-Id')
+    await databse.removeUserAssignments(userId)
+    return new Response('OK', { status: 200 })
+  } catch (error) {
+    console.log(error)
+    return new Response(error, { status: 500 })
+  }
+}
+
 const handleGetFirstUndone = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')
     const assignment = await programmingAssignmentService.getFirstUndone(userId)
     if (!assignment) {
-      return new Response('No undone assignments', { status: 404 })
+      return new Response(null, { status: 204 })
     }
     return new Response(JSON.stringify(assignment), {
       headers: { 'Content-Type': 'application/json' },
@@ -126,18 +138,23 @@ const urlMapping = [
   },
   {
     method: 'POST',
-    pattern: new URLPattern({ pathname: '/grader' }),
-    fn: handlePostFeedback,
-  },
-  {
-    method: 'POST',
     pattern: new URLPattern({ pathname: '/assignments/submit' }),
     fn: handlePost,
   },
   {
     method: 'GET',
+    pattern: new URLPattern({ pathname: '/assignments/reset' }),
+    fn: handleResetAssignments,
+  },
+  {
+    method: 'GET',
     pattern: new URLPattern({ pathname: '/users/points' }),
     fn: handleGetPoints,
+  },
+  {
+    method: 'POST',
+    pattern: new URLPattern({ pathname: '/grader' }),
+    fn: handlePostFeedback,
   },
 ]
 
