@@ -9,6 +9,7 @@ const handlePost = async (request) => {
     const { code, assignment_id } = await request.json()
     const userId = request.headers.get('X-User-Id')
 
+    // Handle duplicate submissions
     const matchingSubmission =
       await programmingAssignmentService.findMatchingSubmission(
         assignment_id,
@@ -19,6 +20,7 @@ const handlePost = async (request) => {
       return new Response(JSON.stringify(matchingSubmission), { status: 200 })
     }
 
+    // Check if user is already in queue
     if (gradingQueueService.user_queue.has(userId)) {
       return new Response('Already in queue', { status: 200 })
     }
@@ -37,6 +39,7 @@ const handlePost = async (request) => {
       assignment_id
     )
 
+    // Send to queue
     gradingQueueService.sendToQueue(submission, test_code)
     return Response.json(submission)
   } catch (e) {
@@ -45,6 +48,7 @@ const handlePost = async (request) => {
   }
 }
 
+// Handle the submissons status websocket update
 const handleStatus = async (request, urlPatternResult) => {
   const id = urlPatternResult.pathname.groups.id
   const { socket, response } = Deno.upgradeWebSocket(request)
@@ -58,6 +62,7 @@ const handleStatus = async (request, urlPatternResult) => {
   return response
 }
 
+// Reset all user assignments
 const handleResetAssignments = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')
@@ -69,6 +74,7 @@ const handleResetAssignments = async (request) => {
   }
 }
 
+// Fetch undone assisgnments for user
 const handleGetFirstUndone = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')
@@ -85,6 +91,7 @@ const handleGetFirstUndone = async (request) => {
   }
 }
 
+// Fetch user points
 const handleGetPoints = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')
@@ -98,6 +105,7 @@ const handleGetPoints = async (request) => {
   }
 }
 
+// Handle the feedback posted from the grader
 const handlePostFeedback = async (request) => {
   try {
     const result = await request.json()
