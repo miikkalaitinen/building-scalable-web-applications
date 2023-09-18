@@ -6,8 +6,11 @@
   let title = "";
   let handout = "";
   let id = 0;
-  let submission = "";
   let allDone = false;
+  
+  let submission = "";
+  let lines = "1\n";
+  let lineCount = 1;
 
   let submission_status;
   let webSocket;
@@ -84,6 +87,20 @@
     points.set(data.points);
   }
 
+  const setLineCount = (text) => {
+    console.log(text);
+    const count = text.split(/\r|\r\n|\n/).length;
+    if (count != lineCount) {
+      lines = "";
+      lineCount = count;
+      for (let i = 1; i <= lineCount; i++) {
+        lines += i + "\n";
+      }
+    }
+  }
+
+  $: setLineCount(submission);
+
   onMount(async () => {
     await fetchAssignment();
     await fetchPoints();
@@ -115,7 +132,10 @@
   <h1 class="text-2xl ">{title || "Loading"}</h1>
   <p class="text-lg">{handout || "Loading"}</p>
 
-  <textarea id="textbox" bind:value={submission} class="w-full h-64 border-2 border-gray-300 rounded-md p-2"></textarea>
+  <div class="flex w-full">
+    <textarea id="linebox" readonly bind:value={lines} class="w-1/12 h-100 border-2 bg-gray-50 rounded-s-md p-2 resize-none !outline-none text-right text-gray-400"></textarea>
+    <textarea id="textbox" bind:value={submission} class="w-11/12 h-64 border-2 border-gray-300 rounded-e-md p-2"></textarea>
+  </div>
 
   {#if submission_status}
     <Feedback {submission_status} />
