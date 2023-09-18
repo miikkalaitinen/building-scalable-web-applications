@@ -48,10 +48,20 @@ const getTestCode = async (assignment_id) => {
   return testCode[0].test_code
 }
 
+const getUserPoints = async (studentId) => {
+  const ids = await database.findUserPoints(studentId)
+  let points = 0
+  for (const id in ids) {
+    points += 100
+  }
+  return points
+}
+
 export {
   findMatchingSubmission,
   insertNewSubmission,
   getFirstUndone,
   updateSubmission,
   getTestCode,
+  getUserPoints,
 }
