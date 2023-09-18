@@ -1,4 +1,3 @@
-import { sockets } from '../app.js'
 import { createClient } from 'npm:redis@4.6.4'
 
 export let user_queue = new Set()
