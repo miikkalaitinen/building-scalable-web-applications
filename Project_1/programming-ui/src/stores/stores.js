@@ -7,4 +7,6 @@ if (!user) {
   localStorage.setItem('userUuid', user)
 }
 
+export let points = 0
+
 export const userUuid = readable(user)

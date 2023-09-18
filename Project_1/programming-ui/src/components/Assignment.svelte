@@ -22,14 +22,15 @@
     });
     const data = await response.json();
 
+
     const host = window.location.hostname;
     webSocket = new WebSocket(`ws://${host}:7800/api/assignments/status/${data.id}`);
     webSocket.onmessage = (event) => {
-      console.log(event.data);
+      submission_status = JSON.parse(event.data);
     };
   };
 
-  onMount(async () => {
+  const fetchAssignment = async () => {
     const response = await fetch("/api/assignments/undone", {
       method: "GET",
       headers: {
@@ -40,6 +41,10 @@
     title = data.title;
     handout = data.handout;
     id = data.id;
+  }
+
+  onMount(async () => {
+    await fetchAssignment();
 
     document.getElementById("textbox").addEventListener("keydown", function(e) {
       if (e.key === "Tab") {
@@ -63,6 +68,14 @@
 
 {#if submission_status}
   <Feedback {submission_status} />
+  {#if submission_status.correct}
+    <button
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+    on:click={fetchAssignment}
+  >
+  Next assignment
+  </button>
+  {/if}
 {:else}
   <button
     class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
