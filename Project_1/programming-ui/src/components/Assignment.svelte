@@ -53,8 +53,8 @@
 
     const data = await response.json();
 
-    submission = "";
     submission_status = null;
+    submission = "";
     title = data.title;
     handout = data.handout;
     id = data.id;
@@ -68,6 +68,7 @@
       },
     });
     allDone = false;
+    submission_status = null;
     fetchAssignment();
     fetchPoints();
   }
