@@ -1,16 +1,19 @@
 <script>
-  export let submission_status;
+  export let submission_status
 </script>
 
-{#if submission_status.status="pending"}
+{#if submission_status.status == "pending"}
 <div class={`rounded-md h-96 p-12 bg-slate-200`}>
-  <h3>In grading...</h3>
+  <h2>
+    w
+    In grading...
+  </h2>
 </div>
 {:else}
-<div class={`rounded-md h-96 p-12 ${submission_status.correct ? "bg-green-200" : "bg-red-200"}`}>
-  <h3>Graded!</h3>
+<div class={`rounded-md px-10 py-6 ${submission_status.correct ? "bg-green-200" : "bg-red-200"}`}>
+  <h2 class="text-xl my-2">Graded!</h2>
   <p>Test status: {submission_status.test_status}</p>
   <h4>Grader feedback:</h4>
-  <div class="bg-white">{submission_status.grader_feedback}</div>
+  <div class="bg-white p-2 rounded-md whitespace-pre-wrap">{submission_status.grader_feedback}</div>
 </div>
 {/if}

@@ -1,4 +1,4 @@
-import { readable } from 'svelte/store'
+import { readable, writable } from 'svelte/store'
 
 let user = localStorage.getItem('userUuid')
 
@@ -7,6 +7,6 @@ if (!user) {
   localStorage.setItem('userUuid', user)
 }
 
-export let points = 0
+export const points = writable(0)
 
 export const userUuid = readable(user)

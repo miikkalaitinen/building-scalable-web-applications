@@ -1,5 +1,5 @@
 <script>
-  import { userUuid } from "../stores/stores.js";
+  import { userUuid, points } from "../stores/stores.js";
   import { onMount } from "svelte";
   import Feedback from "./Feedback.svelte";
 
@@ -7,9 +7,9 @@
   let handout = "";
   let id = 0;
   let submission = "";
+  let allDone = false;
 
   let submission_status;
-
   let webSocket;
 
   const postSubmission = async () => {
@@ -22,11 +22,19 @@
     });
     const data = await response.json();
 
+    if (data.status === "processed") {
+      submission_status = data;
+      fetchPoints();
+      return;
+    } else {
+      submission_status = {status: "pending"};
+    }
 
     const host = window.location.hostname;
     webSocket = new WebSocket(`ws://${host}:7800/api/assignments/status/${data.id}`);
     webSocket.onmessage = (event) => {
       submission_status = JSON.parse(event.data);
+      fetchPoints();
     };
   };
 
@@ -37,15 +45,47 @@
         'X-User-Id': $userUuid,
       },
     });
+
+    if (response.status === 204) {
+      allDone = true;
+      return;
+    }
+
     const data = await response.json();
+
+    submission = "";
+    submission_status = null;
     title = data.title;
     handout = data.handout;
     id = data.id;
   }
 
+  const resetAssignments = async () => {
+    await fetch("/api/assignments/reset", {
+      method: "GET",
+      headers: {
+        'X-User-Id': $userUuid,
+      },
+    });
+    allDone = false;
+    fetchAssignment();
+    fetchPoints();
+  }
+
+  const fetchPoints = async () => {
+    const response = await fetch("/api/users/points", {
+      method: "GET",
+      headers: {
+        'X-User-Id': $userUuid,
+      },
+    });
+    const data = await response.json();
+    points.set(data.points);
+  }
+
   onMount(async () => {
     await fetchAssignment();
-
+    await fetchPoints();
     document.getElementById("textbox").addEventListener("keydown", function(e) {
       if (e.key === "Tab") {
         e.preventDefault();
@@ -61,26 +101,43 @@
 
 </script>
 
-<h1>{title || "Loading"}</h1>
-<p>{handout || "Loading"}</p>
-
-<textarea id="textbox" bind:value={submission} class="w-full h-64 border-2 border-gray-300 rounded-md p-2"></textarea>
-
-{#if submission_status}
-  <Feedback {submission_status} />
-  {#if submission_status.correct}
-    <button
-    class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
-    on:click={fetchAssignment}
-  >
-  Next assignment
-  </button>
-  {/if}
-{:else}
+{#if allDone} 
+  <h1 class="text-2xl ">You have completed all assignments</h1>
   <button
-    class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
-    on:click={postSubmission}
+  class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+  on:click={resetAssignments}
   >
-   Grade my code
+  Reset all assignments
   </button>
+{:else}
+
+  <h1 class="text-2xl ">{title || "Loading"}</h1>
+  <p class="text-lg">{handout || "Loading"}</p>
+
+  <textarea id="textbox" bind:value={submission} class="w-full h-64 border-2 border-gray-300 rounded-md p-2"></textarea>
+
+  {#if submission_status}
+    <Feedback {submission_status} />
+    {#if submission_status.correct}
+      <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+      on:click={fetchAssignment}
+    >
+    Next assignment
+    </button>
+    {:else if submission_status.status == "processed"}
+      <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+      on:click={() => { submission_status = null; }}>
+      Close feedback and try again
+      </button>
+    {/if}
+  {:else}
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+      on:click={postSubmission}
+    >
+    Grade my code
+    </button>
+  {/if}
 {/if}
