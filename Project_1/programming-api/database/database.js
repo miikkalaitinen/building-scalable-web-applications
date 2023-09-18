@@ -1,4 +1,5 @@
 import { postgres } from '../deps.js'
+
 const sql = postgres({})
 
 const findUserPoints = async (user_uuid) => {
@@ -11,17 +12,17 @@ const findUserPoints = async (user_uuid) => {
 
 const findMatching = async (user_uuid, code, assignment_id) => {
   return await sql`SELECT status, grader_feedback, correct FROM programming_assignment_submissions 
-  WHERE user_uuid = ${user_uuid} 
-  AND code = ${code} 
-  AND programming_assignment_id = ${assignment_id};`
+    WHERE user_uuid = ${user_uuid} 
+    AND code = ${code} 
+    AND programming_assignment_id = ${assignment_id};`
 }
 
 const getTestCode = async (assignment_id) => {
   return await sql`
-  SELECT test_code
-  FROM programming_assignments
-  WHERE id = ${assignment_id};
-  `
+    SELECT test_code
+    FROM programming_assignments
+    WHERE id = ${assignment_id};
+    `
 }
 
 const firstUndone = async (user_uuid) => {

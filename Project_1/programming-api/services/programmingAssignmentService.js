@@ -1,4 +1,11 @@
 import * as database from '../database/database.js'
+import { createClient } from 'npm:redis@4.6.4'
+
+const client = createClient({
+  url: 'redis://redis:6379',
+  pingInterval: 1000,
+})
+await client.connect()
 
 const findMatchingSubmission = async (assignmentId, studentId, code) => {
   const matchingSubmissions = await database.findMatching(
@@ -41,19 +48,31 @@ const getFirstUndone = async (studentId) => {
 }
 
 const getTestCode = async (assignment_id) => {
-  const testCode = await database.getTestCode(assignment_id)
+  let testCode = await client.get(`test_code_${assignment_id}`)
+  if (testCode) {
+    return testCode
+  }
+
+  testCode = await database.getTestCode(assignment_id)
   if (!testCode[0]) {
     return null
   }
+  client.set(`test_code_${assignment_id}`, testCode[0].test_code)
   return testCode[0].test_code
 }
 
 const getUserPoints = async (studentId) => {
+  let userPoints = await client.get(`user_points_${studentId}`)
+  if (userPoints) {
+    return userPoints
+  }
+
   const ids = await database.findUserPoints(studentId)
   let points = 0
   for (const id in ids) {
     points += 100
   }
+  client.set(`user_points_${studentId}`, points)
   return points
 }
 
