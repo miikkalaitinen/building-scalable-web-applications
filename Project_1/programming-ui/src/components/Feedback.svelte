@@ -13,6 +13,6 @@
   <h2 class="text-xl my-2">Graded!</h2>
   <p>Test status: {submission_status.test_status}</p>
   <h4>Grader feedback:</h4>
-  <div class="bg-white p-2 rounded-md whitespace-pre-wrap">{submission_status.grader_feedback}</div>
+  <div id="tracebackbox" class="bg-white p-2 rounded-md whitespace-pre-wrap">{submission_status.grader_feedback}</div>
 </div>
 {/if}

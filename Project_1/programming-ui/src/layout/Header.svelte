@@ -6,7 +6,7 @@
   <div class="mx-auto flex">
   <span class="text-2xl pt-2 -ms-8 me-8">Hello {$userUuid}!</span>
   <div>
-    <p class="text-sm">Your points: {$points}/300</p>
+    <p class="text-sm" id="points">Your points: {$points}/300</p>
     <div class="flex w-96">
       {#if $points == 0}
         <div class="w-96 bg-gray-400 rounded-3xl">&nbsp;</div>

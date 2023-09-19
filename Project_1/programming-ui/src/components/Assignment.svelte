@@ -181,7 +181,7 @@
   {:else}
   <div class="mx-auto w-5/6">
     <h1 class="text-2xl ">{title || "Loading"}</h1>
-    <p class="text-lg">{handout || "Loading"}</p>
+    <p id="handout" class="text-lg">{handout || "Loading"}</p>
 
     <div class="flex w-full max-w-6xl">
       <textarea id="linebox" readonly bind:value={lines} class="w-1/12 h-64 border-2 bg-gray-50 rounded-s-md p-2 resize-none !outline-none text-right text-gray-400"></textarea>
