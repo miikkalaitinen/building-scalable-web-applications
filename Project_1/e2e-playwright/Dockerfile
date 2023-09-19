@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.31.1-focal
+FROM mcr.microsoft.com/playwright:v1.38.0-focal
 
 COPY . /e2e-playwright
 
