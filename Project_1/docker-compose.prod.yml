@@ -114,5 +114,11 @@ services:
     network_mode: host
     depends_on:
       - nginx
+      - programming-api
+      - programming-ui
+      - grader-api
+      - database
+      - redis
+      - flyway
     volumes:
       - ./e2e-playwright/tests:/e2e-playwright/tests
