@@ -1,0 +1,1 @@
+Only problem i had was to get `MY_APP_DATABASE_CLUSTER_RW_SERVICE_HOST` to be injected into the container. This is because at first I did not realise that i had to change the `MY_APP` used in the chapter to `VISIT_COUNTER_APP`
