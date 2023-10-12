@@ -16,6 +16,12 @@
       },
     })
     question = await res.json()
+
+    const host = window.location.hostname;
+    webSocket = new WebSocket(`ws://${host}:7800/api/socket/answer`);
+    webSocket.onmessage = (event) => {
+      console.log(event.data);
+    };
   })
 
   const handleUpvote = async (answer_id) => {

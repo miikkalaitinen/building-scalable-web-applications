@@ -15,6 +15,8 @@ import * as qaApiService from './services/qaApiService.js'
 //   return response;
 // };
 
+export let sockets = new Set()
+
 const handleGetCourses = async (request) => {
   try {
     const courses = await qaApiService.handleGetAllCourses()
@@ -131,7 +133,30 @@ const handleDeleteUpvote = async (request) => {
   }
 }
 
+const handleSocket = async (request, urlPatternResult) => {
+  try {
+    const type = urlPatternResult.pathname.groups.type
+    const { socket, response } = Deno.upgradeWebSocket(request)
+
+    sockets.add({ socket, type })
+
+    socket.onclose = () => {
+      sockets.delete({ socket, type })
+    }
+
+    return response
+  } catch (error) {
+    console.log(error)
+    return new Response('Internal server error', { status: 500 })
+  }
+}
+
 const urlMapping = [
+  {
+    method: 'GET',
+    pattern: new URLPattern({ pathname: '/socket/:type' }),
+    fn: handleSocket,
+  },
   {
     method: 'GET',
     pattern: new URLPattern({ pathname: '/courses' }),

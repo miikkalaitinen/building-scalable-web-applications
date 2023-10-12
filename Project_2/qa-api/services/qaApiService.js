@@ -1,4 +1,8 @@
 import * as database from '../database/database.js'
+import { pubClient } from './pubService.js'
+import { subClient } from './subService.js'
+
+export let timeout_users = new Set()
 
 const handleGetAllCourses = async () => {
   const courses = await database.getCourses()
@@ -90,6 +94,7 @@ const handlePostQuestion = async (
     question_description,
     user
   )
+  pubClient.publish('qa', JSON.stringify({ type: 'question', data: res[0] }))
   return res[0]
 }
 
@@ -98,6 +103,7 @@ const handlePostAnswer = async (question_id, answer, user) => {
     throw new Error('Missing required fields')
   }
   const res = await database.addAnswer(question_id, answer, user)
+  pubClient.publish('qa', JSON.stringify({ type: 'answer', data: res[0] }))
   return res[0]
 }
 

@@ -20,9 +20,9 @@
         question_description: question_description
       })
     })
-    .then(res => res.json())
-    .then(data => {
-      console.log(data);
+    .then(() => {
+      question_description = "";
+      question_title = "";
       show_form = false;
     })
     .catch(err => console.log(err));

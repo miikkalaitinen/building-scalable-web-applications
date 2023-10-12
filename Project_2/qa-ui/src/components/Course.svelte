@@ -8,8 +8,9 @@
   export let id;
 
   let course = {}
+  let webSocket;
 
-  onMount(async () => {
+  const getCourse = async () => {
     const res = await fetch(`/api/courses/${id}`, {
       method: "GET",
       headers: {
@@ -17,6 +18,21 @@
       },
     })
     course = await res.json()
+  }
+
+  onMount(() => {
+    getCourse();
+
+    const host = window.location.hostname;
+    webSocket = new WebSocket(`ws://${host}:7800/api/socket/question`);
+    console.log(webSocket);
+    webSocket.onmessage = (event) => {
+      console.log(event.data);
+    };
+
+    return () => {
+      webSocket.close();
+    };
   })
 
   const handleUpvote = async (question_id) => {

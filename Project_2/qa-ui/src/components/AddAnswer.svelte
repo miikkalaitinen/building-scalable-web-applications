@@ -18,9 +18,8 @@
         answer_text: answer_text,
       })
     })
-    .then(res => res.json())
-    .then(data => {
-      console.log(data);
+    .then(() => {
+      answer_text = "";
       show_form = false;
     })
     .catch(err => console.log(err));
