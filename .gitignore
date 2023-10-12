@@ -1,6 +1,6 @@
 .DS_Store
 production-database-data/
 **/*.zip
-Project_1/app-cache
+**/app-cache
 **/node_modules
 **/**.env
