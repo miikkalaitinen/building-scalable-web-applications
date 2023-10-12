@@ -44,17 +44,11 @@
 {#if question.question_title}
 <div>
   <BackButton />
-  <h1>{question.question_title}</h1>
-  <p>{question.question_text}</p>
 
-  <h2 class="my-5">Funtionality</h2>
-  <ul>
-    <li>✔️ Answer question</li>
-    <li>✔️ List answers</li>
-    <li>Upvote answer</li>
-  </ul>
+  <h1 class="mb-4 text-xl">Question: {question.question_title}</h1>
+  <p class="mb-2 text-md">{question.question_text}</p>
 
-  <h2>Answers:</h2>
+  <h2 class="mb-4 text-lg my-5">Answers:</h2>
   {#each question.answers as answer}
     <div class="rounded-lg m-5 p-5 text-white bg-goodblue flex items-center">
       <div class="flex-auto w-64">
