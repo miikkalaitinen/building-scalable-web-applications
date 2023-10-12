@@ -44,10 +44,10 @@
 {#if course.course_name}
 <div>
   <BackButton />
-  <h1 class="mb-4 text-xl">Questions for course: {course.course_name}</h1>
+  <h1 class="mb-4 text-xl">Course: {course.course_name}</h1>
   <p class="mb-2 text-md">{course.course_description}</p> 
 
-  <h2 class="mb-4 text-lg my-5">Questions</h2>
+  <h2 class="mb-4 text-lg my-5">Questions: </h2>
 
   {#each course.questions as question}
   <div class="rounded-lg m-5 p-5 text-white bg-goodblue flex items-center">
