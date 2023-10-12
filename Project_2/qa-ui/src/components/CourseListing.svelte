@@ -1,6 +1,5 @@
 <script>
   import { onMount } from "svelte"
-  import BackButton from "./BackButton.svelte"
 
   let courses = []
 
@@ -11,9 +10,8 @@
 </script>
 
 <div>
-  <BackButton />
-  <h2>Main Page</h2>
-  <p>Lists available courses and allows selecting a course, which opens up the course page.</p>
+  <h1 class="mb-4 text-xl">Welcome to 🌊 University Q&A site</h1>
+  <h2 class="mb-2 text-lg">Courses:</h2>
   {#each courses as course}
   <a href={`/course/${course.course_id}`}>
     <div class="rounded-lg m-5 p-5 text-white bg-goodblue">

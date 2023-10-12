@@ -94,10 +94,26 @@ const handlePostQuestion = async (
 }
 
 const handlePostAnswer = async (question_id, answer, user) => {
-  if ((!question_id, !answer, !user)) {
+  if (!question_id || !answer || !user) {
     throw new Error('Missing required fields')
   }
   const res = await database.addAnswer(question_id, answer, user)
+  return res[0]
+}
+
+const handlePostUpvote = async (question_id, answer_id, user) => {
+  if ((!question_id && !answer_id) || !user) {
+    throw new Error('Missing required fields')
+  }
+  const res = await database.addUpvote(question_id, answer_id, user)
+  return res[0]
+}
+
+const handleDeleteUpvote = async (question_id, answer_id, user) => {
+  if ((!question_id && !answer_id) || !user) {
+    throw new Error('Missing required fields')
+  }
+  const res = await database.deleteUpvote(question_id, answer_id, user)
   return res[0]
 }
 
@@ -107,4 +123,6 @@ export {
   handleGetQuestion,
   handlePostQuestion,
   handlePostAnswer,
+  handlePostUpvote,
+  handleDeleteUpvote,
 }

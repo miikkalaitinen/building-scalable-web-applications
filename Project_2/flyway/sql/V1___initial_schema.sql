@@ -29,7 +29,9 @@ CREATE TABLE upvotes (
   user_id UUID,
   answer_id INT REFERENCES answers(answer_id),
   question_id INT REFERENCES questions(question_id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  CONSTRAINT UC_Answer_Upvote UNIQUE (user_id, answer_id),
+  CONSTRAINT UC_Question_Upvote UNIQUE (user_id, question_id)
 );
 
 CREATE INDEX questions_course_id_idx ON questions(course_id);

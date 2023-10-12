@@ -24,7 +24,6 @@ const getAnswers = async (question_id) => {
 
 const getUpvotes = async (question_ids, answer_ids) => {
   if (question_ids && answer_ids) {
-    console.log('question_id and answer_id')
     return await sql`SELECT * FROM upvotes WHERE question_id IN ${sql(
       question_ids
     )} AND answer_id IN ${sql(answer_ids)}`
@@ -60,6 +59,26 @@ const addAnswer = async (question_id, answer, user) => {
   `
 }
 
+const addUpvote = async (question_id, answer_id, user) => {
+  if (question_id && answer_id) {
+    return sql`INSERT INTO upvotes (question_id, answer_id, user_id) VALUES (${question_id}, ${answer_id}, ${user}) RETURNING *;`
+  } else if (question_id) {
+    return sql`INSERT INTO upvotes (question_id, user_id) VALUES (${question_id}, ${user}) RETURNING *;`
+  } else if (answer_id) {
+    return sql`INSERT INTO upvotes (answer_id, user_id) VALUES (${answer_id}, ${user}) RETURNING *;`
+  } else return null
+}
+
+const deleteUpvote = async (question_id, answer_id, user) => {
+  if (question_id && answer_id) {
+    return sql`DELETE FROM upvotes WHERE question_id = ${question_id} AND answer_id = ${answer_id} AND user_id = ${user};`
+  } else if (question_id) {
+    return sql`DELETE FROM upvotes WHERE question_id = ${question_id} AND user_id = ${user};`
+  } else if (answer_id) {
+    return sql`DELETE FROM upvotes WHERE answer_id = ${answer_id} AND user_id = ${user}`
+  } else return null
+}
+
 export {
   getCourses,
   getCourse,
@@ -69,4 +88,6 @@ export {
   getUpvotes,
   addQuestion,
   addAnswer,
+  addUpvote,
+  deleteUpvote,
 }

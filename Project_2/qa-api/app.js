@@ -93,6 +93,44 @@ const handlePostAnswer = async (request) => {
   }
 }
 
+const handlePostUpvote = async (request) => {
+  try {
+    const userId = await request.headers.get('X-User-Id')
+    const { question_id, answer_id } = await request.json()
+    const newUpvote = await qaApiService.handlePostUpvote(
+      question_id,
+      answer_id,
+      userId
+    )
+    return new Response(JSON.stringify(newUpvote), {
+      headers: { 'content-type': 'application/json' },
+    })
+  } catch (error) {
+    console.log(error)
+    return new Response('Internal server error', { status: 500 })
+  }
+}
+
+const handleDeleteUpvote = async (request) => {
+  try {
+    const userId = await request.headers.get('X-User-Id')
+    const url = new URL(request.url)
+    const answer_id = url.searchParams.get('answer_id')
+    const question_id = url.searchParams.get('question_id')
+    const deletedUpvote = await qaApiService.handleDeleteUpvote(
+      question_id,
+      answer_id,
+      userId
+    )
+    return new Response(JSON.stringify(deletedUpvote), {
+      headers: { 'content-type': 'application/json' },
+    })
+  } catch (error) {
+    console.log(error)
+    return new Response('Internal server error', { status: 500 })
+  }
+}
+
 const urlMapping = [
   {
     method: 'GET',
@@ -118,6 +156,16 @@ const urlMapping = [
     method: 'POST',
     pattern: new URLPattern({ pathname: '/answers' }),
     fn: handlePostAnswer,
+  },
+  {
+    method: 'POST',
+    pattern: new URLPattern({ pathname: '/upvote' }),
+    fn: handlePostUpvote,
+  },
+  {
+    method: 'DELETE',
+    pattern: new URLPattern({ pathname: '/upvote' }),
+    fn: handleDeleteUpvote,
   },
 ]
 

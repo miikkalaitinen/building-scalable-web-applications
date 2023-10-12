@@ -18,6 +18,27 @@
     })
     course = await res.json()
   })
+
+  const handleUpvote = async (question_id) => {
+    const res = await fetch(`/api/upvote`, {
+      method: "POST",
+      headers: {
+        'X-User-Id': $userUuid,
+      },
+      body: JSON.stringify({
+        question_id: question_id,
+      })
+    })
+  }
+
+  const handleRemoveUpvote = async (question_id) => {
+    const res = await fetch(`/api/upvote?question_id=${question_id}`, {
+      method: "DELETE",
+      headers: {
+        'X-User-Id': $userUuid,
+      },
+    })
+  }
 </script>
 
 {#if course.course_name}
@@ -28,25 +49,34 @@
 
   <h2 class="my-5">Funtionality</h2>
   <ul>
-    <li>Create new questions</li>
-    <li>List questions</li>
+    <li>✔️ Create new questions</li>
+    <li>✔️ List questions</li>
     <li>Upvote questions</li>
-    <li>Open question</li>
+    <li>✔️ Open question</li>
   </ul>
 
   <h2 class="my-5">Questions</h2>
 
   {#each course.questions as question}
-  <a href={`/question/${question.question_id}`}>
-    <div class="rounded-lg m-5 p-5 text-white bg-goodblue flex items-center">
-      <div class="flex-auto w-64">
+  <div class="rounded-lg m-5 p-5 text-white bg-goodblue flex items-center">
+    <a class="flex-auto w-64" href={`/question/${question.question_id}`}>
+      <div>
         <h1>{question.question_title}</h1>
       </div>
-      <div class="flex-none w-14">
-        <p>{question.upvotes}</p>
-      </div>
+    </a>
+    <div class="flex-none w-14 flex items-center">
+      <p>{question.upvotes}</p>
+      {#if question.user_upvoted}
+        <button on:click={() => handleRemoveUpvote(question.question_id)}>
+          <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+        </button>
+      {:else}
+        <button on:click={() => handleUpvote(question.question_id)}>
+          <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+        </button>
+      {/if}
     </div>
-  </a>
+  </div>
   {/each}
 
   <AddQuestion course_id={id} />

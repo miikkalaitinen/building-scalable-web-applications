@@ -1,7 +1,1 @@
-<script>
-  import { useNavigate } from "svelte-navigator";
-
-  const navigate = useNavigate();
-</script>
-
-<button title="Go back" on:click={() => navigate(-1)}>&lt;-</button>
+<button title="Go back" class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded m-2" on:click={() => history.back()}>&lt;-</button>
