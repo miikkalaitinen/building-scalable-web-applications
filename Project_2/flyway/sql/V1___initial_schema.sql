@@ -13,7 +13,8 @@ CREATE TABLE questions (
   question_text TEXT NOT NULL,
   user_id UUID,
   course_id INT REFERENCES courses(course_id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE answers (
@@ -21,7 +22,8 @@ CREATE TABLE answers (
   answer_text TEXT NOT NULL,
   user_id UUID,
   question_id INT REFERENCES questions(question_id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE upvotes (
