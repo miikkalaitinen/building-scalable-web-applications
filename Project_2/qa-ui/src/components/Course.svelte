@@ -139,7 +139,7 @@
       {/if}
     </div>
     <div>
-      <p class="p-2">Answers: XX</p>
+      <p class="p-2">{String(question.question_text).length > 60 ? `${String(question.question_text).substring(0,60)}...` : question.question_text}</p>
     </div>
   </div>
   {/each}
