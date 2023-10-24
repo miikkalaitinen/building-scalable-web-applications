@@ -10,16 +10,18 @@ const getCourse = async (id) => {
   return await sql`SELECT * FROM courses WHERE course_id = ${id}`
 }
 
-const getQuestions = async (course_id) => {
-  return await sql`SELECT * FROM questions WHERE course_id = ${course_id}`
+const getQuestions = async (course_id, page) => {
+  const offset = (page - 1) * 20
+  return await sql`SELECT * FROM questions WHERE course_id = ${course_id} ORDER BY updated_at DESC LIMIT 20 OFFSET ${offset}`
 }
 
 const getQuestion = async (question_id) => {
   return await sql`SELECT * FROM questions WHERE question_id = ${question_id}`
 }
 
-const getAnswers = async (question_id) => {
-  return await sql`SELECT * FROM answers WHERE question_id = ${question_id}`
+const getAnswers = async (question_id, page) => {
+  const offset = (page - 1) * 20
+  return await sql`SELECT * FROM answers WHERE question_id = ${question_id} ORDER BY updated_at DESC LIMIT 20 OFFSET ${offset}`
 }
 
 const getUpvotes = async (question_ids, answer_ids) => {
@@ -60,22 +62,22 @@ const addAnswer = async (question_id, answer, user) => {
 }
 
 const addUpvote = async (question_id, answer_id, user) => {
-  if (question_id && answer_id) {
-    return sql`INSERT INTO upvotes (question_id, answer_id, user_id) VALUES (${question_id}, ${answer_id}, ${user}) RETURNING *;`
-  } else if (question_id) {
-    return sql`INSERT INTO upvotes (question_id, user_id) VALUES (${question_id}, ${user}) RETURNING *;`
+  if (question_id) {
+    await sql`UPDATE questions SET updated_at = NOW() WHERE question_id = ${question_id}`
+    return await sql`INSERT INTO upvotes (question_id, user_id) VALUES (${question_id}, ${user}) RETURNING *;`
   } else if (answer_id) {
-    return sql`INSERT INTO upvotes (answer_id, user_id) VALUES (${answer_id}, ${user}) RETURNING *;`
+    await sql`UPDATE answers SET updated_at = NOW() WHERE answer_id = ${answer_id}`
+    return await sql`INSERT INTO upvotes (answer_id, user_id) VALUES (${answer_id}, ${user}) RETURNING *;`
   } else return null
 }
 
 const deleteUpvote = async (question_id, answer_id, user) => {
-  if (question_id && answer_id) {
-    return sql`DELETE FROM upvotes WHERE question_id = ${question_id} AND answer_id = ${answer_id} AND user_id = ${user};`
-  } else if (question_id) {
-    return sql`DELETE FROM upvotes WHERE question_id = ${question_id} AND user_id = ${user};`
+  if (question_id) {
+    await sql`UPDATE questions SET updated_at = NOW() WHERE question_id = ${question_id}`
+    return await sql`DELETE FROM upvotes WHERE question_id = ${question_id} AND user_id = ${user};`
   } else if (answer_id) {
-    return sql`DELETE FROM upvotes WHERE answer_id = ${answer_id} AND user_id = ${user}`
+    await sql`UPDATE answers SET updated_at = NOW() WHERE answer_id = ${answer_id}`
+    return await sql`DELETE FROM upvotes WHERE answer_id = ${answer_id} AND user_id = ${user}`
   } else return null
 }
 

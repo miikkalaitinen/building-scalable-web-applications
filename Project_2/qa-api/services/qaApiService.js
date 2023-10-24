@@ -2,7 +2,8 @@ import * as database from '../database/database.js'
 import { pubClient } from './pubService.js'
 import { subClient } from './subService.js'
 
-export let timeout_users = new Set()
+export const question_timeouts = new Set()
+export const answer_timeouts = new Set()
 
 const handleGetAllCourses = async () => {
   const courses = await database.getCourses()
@@ -16,7 +17,7 @@ const handleGetCourse = async (id, user_id) => {
     return null
   }
   const course = res[0]
-  const questions = await database.getQuestions(course.course_id)
+  const questions = await database.getQuestions(course.course_id, 1)
 
   const questionIds = questions.map((question) => question.question_id)
   const upvotes = await database.getUpvotes(questionIds, null)
@@ -44,6 +45,38 @@ const handleGetCourse = async (id, user_id) => {
   }
 }
 
+const handleGetQuestions = async (id, user_id, page) => {
+  const res = await database.getQuestions(id, page)
+
+  if (!res) {
+    return null
+  }
+
+  const questions = await database.getQuestions(course.course_id, 1)
+
+  const questionIds = questions.map((question) => question.question_id)
+  const upvotes = await database.getUpvotes(questionIds, null)
+
+  const result = questions.map((question) => {
+    const questionUpvotes = upvotes.filter(
+      (upvote) => upvote.question_id === question.question_id
+    )
+
+    const userUpvoted = questionUpvotes.find(
+      (upvote) => upvote.user_id === user_id
+    )
+    const userUpvoteCount = questionUpvotes.length
+
+    return {
+      ...question,
+      upvotes: userUpvoteCount,
+      user_upvoted: !!userUpvoted,
+    }
+  })
+
+  return result
+}
+
 const handleGetQuestion = async (id, user_id) => {
   const res = await database.getQuestion(id)
 
@@ -51,7 +84,7 @@ const handleGetQuestion = async (id, user_id) => {
     return null
   }
   const question = res[0]
-  const answers = await database.getAnswers(question.question_id)
+  const answers = await database.getAnswers(question.question_id, 1)
 
   const answerIds = answers.map((answer) => answer.answer_id)
   const upvotes = await database.getUpvotes(null, answerIds)
@@ -79,32 +112,70 @@ const handleGetQuestion = async (id, user_id) => {
   }
 }
 
+const handleGetAnswers = async (id, user_id, page) => {
+  const res = await database.getAnswers(id, page)
+
+  if (!res) {
+    return null
+  }
+
+  const answers = await database.getAnswers(question.question_id)
+
+  const answerIds = answers.map((answer) => answer.answer_id)
+  const upvotes = await database.getUpvotes(null, answerIds)
+
+  const result = answers.map((answer) => {
+    const answerUpvotes = upvotes.filter(
+      (upvote) => upvote.answer_id === answer.answer_id
+    )
+
+    const userUpvoted = answerUpvotes.find(
+      (upvote) => upvote.user_id === user_id
+    )
+    const userUpvoteCount = answerUpvotes.length
+
+    return {
+      ...answer,
+      upvotes: userUpvoteCount,
+      user_upvoted: !!userUpvoted,
+    }
+  })
+
+  return result
+}
+
 const handlePostQuestion = async (
   course_id,
   question_title,
   question_description,
   user
 ) => {
-  if (!course_id || !question_title || !question_description || !user) {
-    throw new Error('Missing required fields')
-  }
   const res = await database.addQuestion(
     course_id,
     question_title,
     question_description,
     user
   )
-  pubClient.publish('qa', JSON.stringify({ type: 'question', data: res[0] }))
+  pubClient.publish(
+    'qa',
+    JSON.stringify({
+      type: 'question',
+      data: { ...res[0], upvotes: 0, user_upvoted: false },
+    })
+  )
   return res[0]
 }
 
 const handlePostAnswer = async (question_id, answer, user) => {
-  if (!question_id || !answer || !user) {
-    throw new Error('Missing required fields')
-  }
   const res = await database.addAnswer(question_id, answer, user)
-  pubClient.publish('qa', JSON.stringify({ type: 'answer', data: res[0] }))
-  return res[0]
+  pubClient.publish(
+    'qa',
+    JSON.stringify({
+      type: 'answer',
+      data: { ...res[0], upvotes: 0, user_upvoted: false },
+    })
+  )
+  return true
 }
 
 const handlePostUpvote = async (question_id, answer_id, user) => {
@@ -127,6 +198,8 @@ export {
   handleGetAllCourses,
   handleGetCourse,
   handleGetQuestion,
+  handleGetQuestions,
+  handleGetAnswers,
   handlePostQuestion,
   handlePostAnswer,
   handlePostUpvote,

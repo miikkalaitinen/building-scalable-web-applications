@@ -7,7 +7,15 @@
   let question_description = "";
 
   const postQuestion = () => {
-    console.log("postQuestion");
+
+    if (question_title === "") {
+      alert("Question title cannot be empty");
+      return;
+    } else if (question_description === "") {
+      alert("Question description cannot be empty");
+      return;
+    }
+
     fetch(`/api/questions`, {
       method: "POST",
       headers: {
@@ -20,10 +28,15 @@
         question_description: question_description
       })
     })
-    .then(() => {
-      question_description = "";
-      question_title = "";
-      show_form = false;
+    .then((res) => {
+      if (res.status === 201) {
+        question_description = "";
+        question_title = "";
+        show_form = false;
+      } else if (res.status === 429) {
+        alert("You are posting too fast. You can post at most once every 60 seconds.");
+        return;
+      }
     })
     .catch(err => console.log(err));
   }

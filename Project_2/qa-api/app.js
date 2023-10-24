@@ -43,6 +43,22 @@ const handleGetCourse = async (request, urlPatternResult) => {
   }
 }
 
+const handleGetQuestions = async (request, urlPatternResult) => {
+  try {
+    const id = urlPatternResult.pathname.groups.id
+    const userId = await request.headers.get('X-User-Id')
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page'))
+    const questions = await qaApiService.handleGetQuestions(id, userId, page)
+    return new Response(JSON.stringify(questions), {
+      headers: { 'content-type': 'application/json' },
+    })
+  } catch (error) {
+    console.log(error)
+    return new Response('Internal server error', { status: 500 })
+  }
+}
+
 const handleGetQuestion = async (request, urlPatternResult) => {
   try {
     const id = urlPatternResult.pathname.groups.question_id
@@ -62,18 +78,31 @@ const handlePostQuestion = async (request) => {
     const userId = await request.headers.get('X-User-Id')
     const { course_id, question_title, question_description } =
       await request.json()
-    const newQuestion = await qaApiService.handlePostQuestion(
+    if (!course_id || !question_title || !question_description || !userId) {
+      throw new Error('Missing required fields')
+    }
+    if (qaApiService.question_timeouts.has(userId)) {
+      return new Response('You can post at most one question in 60 seconds', {
+        status: 429,
+      })
+    }
+
+    qaApiService.question_timeouts.add(userId)
+    setTimeout(() => {
+      qaApiService.question_timeouts.delete(userId)
+    }, 60000)
+
+    const res = await qaApiService.handlePostQuestion(
       course_id,
       question_title,
       question_description,
       userId
     )
-    return new Response(JSON.stringify(newQuestion), {
-      headers: { 'content-type': 'application/json' },
-    })
+    if (!res) throw new Error('Something failed, no Error was thrown')
+    return new Response('OK', { status: 201 })
   } catch (error) {
     console.log(error)
-    return new Response('Internal server error', { status: 500 })
+    return new Response(error, { status: 500 })
   }
 }
 
@@ -81,17 +110,32 @@ const handlePostAnswer = async (request) => {
   try {
     const userId = await request.headers.get('X-User-Id')
     const { question_id, answer_text } = await request.json()
-    const newAnswer = await qaApiService.handlePostAnswer(
+
+    if (!question_id || !answer_text || !userId) {
+      throw new Error('Missing required fields')
+    }
+
+    if (qaApiService.answer_timeouts.has(userId)) {
+      return new Response('You can post at most one answer in 60 seconds', {
+        status: 429,
+      })
+    }
+
+    qaApiService.answer_timeouts.add(userId)
+    setTimeout(() => {
+      qaApiService.answer_timeouts.delete(userId)
+    }, 60000)
+
+    const res = await qaApiService.handlePostAnswer(
       question_id,
       answer_text,
       userId
     )
-    return new Response(JSON.stringify(newAnswer), {
-      headers: { 'content-type': 'application/json' },
-    })
+    if (!res) throw new Error('Something failed, no Error was thrown')
+    return new Response('OK', { status: 201 })
   } catch (error) {
     console.log(error)
-    return new Response('Internal server error', { status: 500 })
+    return new Response(error, { status: 500 })
   }
 }
 
@@ -137,11 +181,24 @@ const handleSocket = async (request, urlPatternResult) => {
   try {
     const type = urlPatternResult.pathname.groups.type
     const { socket, response } = Deno.upgradeWebSocket(request)
+    let id =
+      (Math.random() + 1).toString(36).substring(7) +
+      (Math.random() + 1).toString(36).substring(7)
 
-    sockets.add({ socket, type })
+    socket.onopen = () => {
+      sockets.add({ socket, type, id })
+    }
 
     socket.onclose = () => {
-      sockets.delete({ socket, type })
+      sockets.forEach((client) => {
+        if (client.id === id) {
+          sockets.delete(client)
+        }
+      })
+    }
+
+    socket.onerror = (error) => {
+      console.log(error)
     }
 
     return response

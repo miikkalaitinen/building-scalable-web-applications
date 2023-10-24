@@ -8,6 +8,7 @@
   export let id;
 
   let course = {}
+  let question_page = 1
   let webSocket;
 
   const getCourse = async () => {
@@ -17,7 +18,10 @@
         'X-User-Id': $userUuid,
       },
     })
-    course = await res.json()
+    if (res.status === 200) {
+      course = await res.json()
+      question_page += 1
+    }
   }
 
   onMount(() => {
@@ -25,13 +29,21 @@
 
     const host = window.location.hostname;
     webSocket = new WebSocket(`ws://${host}:7800/api/socket/question`);
-    console.log(webSocket);
     webSocket.onmessage = (event) => {
-      console.log(event.data);
+      const data = JSON.parse(event.data);
+      console.log(data);
+      course = {
+        ...course,
+        questions: [
+          data.data,
+          ...course.questions,
+        ]}
     };
 
     return () => {
-      webSocket.close();
+      if (ws.readyState === 1) {
+        ws.close();
+      }
     };
   })
 
@@ -45,6 +57,21 @@
         question_id: question_id,
       })
     })
+
+    if (res.status === 200) {
+      const questions = course.questions.map(q => {
+        if (q.question_id === question_id) {
+          q.upvotes += 1
+          q.user_upvoted = true
+        }
+        return q
+      })  
+
+      course = {
+        ...course,
+        questions: questions,
+      }
+    }
   }
 
   const handleRemoveUpvote = async (question_id) => {
@@ -54,40 +81,61 @@
         'X-User-Id': $userUuid,
       },
     })
+
+    if (res.status === 200) {
+      const questions = course.questions.map(q => {
+        if (q.question_id === question_id) {
+          q.upvotes -= 1
+          q.user_upvoted = false
+        }
+
+        return q
+      })  
+
+      course = {
+        ...course,
+        questions: questions,
+      }
+    }
   }
 </script>
 
 {#if course.course_name}
 <div>
-  <BackButton />
-  <h1 class="mb-4 text-xl">Course: {course.course_name}</h1>
-  <p class="mb-2 text-md">{course.course_description}</p> 
 
-  <h2 class="mb-4 text-lg my-5">Questions: </h2>
+  <div class="bg-origin-padding bg-[url('/sisuback.png')] h-64">
+    <BackButton />
+    <h1 class="text-4xl p-8 font-semibold">Course: {course.course_name}</h1>
+    <p class="mb-2 ml-8 text-lg">{course.course_description}</p> 
+  </div>
+
+  <div class="m-5 flex justify-between items-center">
+    <h2 class="text-lg my-5">Questions:</h2>
+    <AddQuestion class="mr-8" course_id={id} />
+  </div>
 
   {#each course.questions as question}
-  <div class="rounded-lg m-5 p-5 text-white bg-goodblue flex items-center">
-    <a class="flex-auto w-64" href={`/question/${question.question_id}`}>
-      <div>
-        <h1>{question.question_title}</h1>
-      </div>
-    </a>
-    <div class="flex-none w-14 flex items-center">
+  <div class="m-5 border-gray-500 border-2">
+    <div class="flex items-center bg-lightblue p-2 ">
+      <a class="flex-auto w-64" href={`/question/${question.question_id}`}>
+        <h1 class="underline text-goodblue">{question.question_title}</h1>
+      </a>
       <p>{question.upvotes}</p>
       {#if question.user_upvoted}
-        <button on:click={() => handleRemoveUpvote(question.question_id)}>
+        <button class="mr-4" on:click={() => handleRemoveUpvote(question.question_id)}>
           <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
         </button>
       {:else}
-        <button on:click={() => handleUpvote(question.question_id)}>
+        <button class="mr-4" on:click={() => handleUpvote(question.question_id)}>
           <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
         </button>
       {/if}
     </div>
+    <div>
+      <p class="p-2">Answers: XX</p>
+    </div>
   </div>
   {/each}
-
-  <AddQuestion course_id={id} />
 </div>
 {:else}
   <p>Loading...</p>

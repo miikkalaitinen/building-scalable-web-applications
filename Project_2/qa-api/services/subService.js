@@ -10,18 +10,26 @@ await subClient.connect()
 subClient.subscribe('qa', (message, channel) => {
   const msg = JSON.parse(message)
   if (msg.type === 'answer') {
-    sockets.forEach((client) => {
-      const { socket, type } = client
-      if (type === 'answer') {
-        socket.send(JSON.stringify(msg))
-      }
-    })
+    try {
+      sockets.forEach((client) => {
+        const { socket, type } = client
+        if (type === 'answer') {
+          socket.send(JSON.stringify(msg))
+        }
+      })
+    } catch (e) {
+      console.log(e)
+    }
   } else if (msg.type === 'question') {
-    sockets.forEach((client) => {
-      const { socket, type } = client
-      if (type === 'question') {
-        socket.send(JSON.stringify(msg))
-      }
-    })
+    try {
+      sockets.forEach((client) => {
+        const { socket, type } = client
+        if (type === 'question') {
+          socket.send(JSON.stringify(msg))
+        }
+      })
+    } catch (e) {
+      console.log(e)
+    }
   }
 })

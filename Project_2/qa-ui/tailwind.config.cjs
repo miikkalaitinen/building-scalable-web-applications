@@ -5,6 +5,9 @@ module.exports = {
     extend: {
       colors: {
         goodblue: '#005eb8',
+        lightblue: '#daedff',
+        coursecolor: '#d0b1e5',
+        coursebg: '#f2f2f2',
       },
     },
   },

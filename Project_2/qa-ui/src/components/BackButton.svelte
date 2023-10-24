@@ -1,1 +1,1 @@
-<button title="Go back" class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded m-2" on:click={() => history.back()}>&lt;-</button>
+<button title="Go back" class="bg-gray-700 hover:bg-gray-500 text-white font-bold px-2 py-1 rounded m-2" on:click={() => history.back()}>←</button>

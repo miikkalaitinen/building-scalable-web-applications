@@ -7,20 +7,44 @@
   export let id;
 
   let question = {};
+  let answer_page = 1;
+  let webSocket;
 
-  onMount(async () => {
+  const getQuestion = async () => {
     const res = await fetch(`/api/questions/${id}`, {
       method: "GET",
       headers: {
         'X-User-Id': $userUuid,
       },
     })
-    question = await res.json()
+    if (res.status === 200) {
+      answer_page += 1;
+      question = await res.json()
+    }
+  }
+
+  onMount(() => {
+    getQuestion();
 
     const host = window.location.hostname;
     webSocket = new WebSocket(`ws://${host}:7800/api/socket/answer`);
+
     webSocket.onmessage = (event) => {
-      console.log(event.data);
+      const data = JSON.parse(event.data);
+      console.log(data);
+        question = {
+          ...question,
+          answers: [
+            data.data,
+            ...question.answers,
+          ]
+        }
+    };
+
+    return () => {
+      if (ws.readyState === 1) {
+        ws.close();
+      }
     };
   })
 
@@ -34,6 +58,20 @@
         answer_id: answer_id,
       })
     })
+
+    if (res.status === 200) {
+      const answers = question.answers.map(a => {
+        if (a.answer_id === answer_id) {
+          a.upvotes += 1
+          a.user_upvoted = true
+        }
+        return a
+      })
+      question = {
+        ...question,
+        answers: answers,
+      }
+    }
   }
 
   const handleRemoveUpvote = async (answer_id) => {
@@ -43,24 +81,45 @@
         'X-User-Id': $userUuid,
       },
     })
+
+    if (res.status === 200) {
+      const answers = question.answers.map(a => {
+        if (a.answer_id === answer_id) {
+          a.upvotes -= 1
+          a.user_upvoted = false
+        }
+        return a
+      })
+      question = {
+        ...question,
+        answers: answers,
+      }
+    }
   }
 
 </script>
 
 {#if question.question_title}
 <div>
-  <BackButton />
 
-  <h1 class="mb-4 text-xl">Question: {question.question_title}</h1>
-  <p class="mb-2 text-md">{question.question_text}</p>
+  <div class="bg-origin-padding bg-[url('/sisuback.png')] h-64">
+    <BackButton />
+    <h1 class="text-4xl p-8 font-semibold">Question: {question.question_title}</h1>
+    <p class="mb-2 ml-8 text-lg">{question.question_text}</p>
+  </div>
 
-  <h2 class="mb-4 text-lg my-5">Answers:</h2>
+  <div class="m-5 flex justify-between items-center">
+    <h2 class="text-lg my-5">Answers:</h2>
+    <AddAnswer class="mr-8" question_id={id} />
+  </div>
+
   {#each question.answers as answer}
-    <div class="rounded-lg m-5 p-5 text-white bg-goodblue flex items-center">
-      <div class="flex-auto w-64">
-        <h1>{answer.answer_text}</h1>
+    <div class="m-5 border-gray-500 border-2 p-5 flex items-center">
+      <div>
+        <h1 class="pb-2 mb-2 border-b-2">Answer posted on xx</h1>
+        <p>{answer.answer_text}</p>
       </div>
-      <div class="flex-none w-14 flex items-center">
+      <div class="flex-none ml-4 flex items-center">
         <p>{answer.upvotes}</p>
         {#if answer.user_upvoted}
           <button on:click={() => handleRemoveUpvote(answer.answer_id)}>
@@ -74,8 +133,6 @@
       </div>
     </div>
   {/each}
-
-  <AddAnswer question_id={id} />
 
 </div>
 {:else}

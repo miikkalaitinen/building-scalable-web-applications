@@ -5,8 +5,12 @@
   let show_form = false;
   let answer_text = "";
 
-  const postQuestion = () => {
-    console.log("postQuestion");
+  const postAnswer = () => {
+
+    if (answer_text === "") {
+      alert("Answer cannot be empty");
+      return;
+    }
     fetch(`/api/answers`, {
       method: "POST",
       headers: {
@@ -18,9 +22,14 @@
         answer_text: answer_text,
       })
     })
-    .then(() => {
-      answer_text = "";
-      show_form = false;
+    .then((res) => {
+      if (res.status === 201) {
+        answer_text = "";
+        show_form = false;
+      } else if (res.status === 429) {
+        alert("You are posting too fast. You can post at most once every 60 seconds.");
+        return;
+      }
     })
     .catch(err => console.log(err));
   }
@@ -37,7 +46,7 @@
       <input type="text" bind:value={answer_text}/>
     </div>
     <div class="flex">
-        <button on:click={() => postQuestion()} class="bg-green-500 hover:bg-green-700 text-white font-bold rounded p-1 m-4">Send Answer</button>
+        <button on:click={() => postAnswer()} class="bg-green-500 hover:bg-green-700 text-white font-bold rounded p-1 m-4">Send Answer</button>
         <button on:click={() => show_form = false} class="bg-red-500 hover:bg-red-700 text-white font-bold rounded p-1 m-4">Cancel</button>
     </div>
   </div>
