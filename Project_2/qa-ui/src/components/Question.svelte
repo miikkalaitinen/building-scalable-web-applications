@@ -9,6 +9,7 @@
   let question = {};
   let answer_page = 1;
   let webSocket;
+  let show_form = false;
 
   const getQuestion = async () => {
     const res = await fetch(`/api/questions/${id}`, {
@@ -110,8 +111,14 @@
 
   <div class="m-5 flex justify-between items-center">
     <h2 class="text-lg my-5">Answers:</h2>
-    <AddAnswer class="mr-8" question_id={id} />
+    {#if !show_form}
+    <button on:click={() => show_form = true} class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4">Add Question</button>
+    {/if}
   </div>
+
+  {#if show_form}
+    <AddAnswer class="mr-8" question_id={id} closeForm={() => show_form = false} />
+  {/if}
 
   {#each question.answers as answer}
     <div class="m-5 border-gray-500 border-2 p-5 flex items-center">

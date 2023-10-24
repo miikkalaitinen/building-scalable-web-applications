@@ -10,6 +10,7 @@
   let course = {}
   let question_page = 1
   let webSocket;
+  let show_form = false;
 
   const getCourse = async () => {
     const res = await fetch(`/api/courses/${id}`, {
@@ -111,8 +112,14 @@
 
   <div class="m-5 flex justify-between items-center">
     <h2 class="text-lg my-5">Questions:</h2>
-    <AddQuestion class="mr-8" course_id={id} />
+    {#if !show_form}
+    <button on:click={() => show_form = true} class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4">Add Question</button>
+    {/if}
   </div>
+
+  {#if show_form}
+    <AddQuestion course_id={id} closeForm={() => {show_form = false}}/>
+  {/if}
 
   {#each course.questions as question}
   <div class="m-5 border-gray-500 border-2">

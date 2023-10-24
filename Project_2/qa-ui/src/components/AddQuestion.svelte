@@ -1,10 +1,14 @@
 <script>
   import { userUuid } from "../stores/stores";
   export let course_id;
+  export let closeForm = () => {};
 
-  let show_form = false;
   let question_title = "";
   let question_description = "";
+
+  const handleCancel = () => {
+    closeForm();
+  }
 
   const postQuestion = () => {
 
@@ -32,7 +36,7 @@
       if (res.status === 201) {
         question_description = "";
         question_title = "";
-        show_form = false;
+        closeForm()
       } else if (res.status === 429) {
         alert("You are posting too fast. You can post at most once every 60 seconds.");
         return;
@@ -43,22 +47,16 @@
 
 </script>
 
-{#if !show_form}
-  <button on:click={() => show_form = true} class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4">Add Question</button>
-{:else}
-  <div class="rounded bg-blue-500 p-1">
-    <div class="m-4">
-      <label for="question_title" class="text-white font-bold">Question Title</label>
-      <br>
-      <input type="text" bind:value={question_title}/>
-      <br>
-      <label for="question_description" class="text-white font-bold">Question Description</label>
-      <br>
-      <textarea bind:value={question_description}></textarea>
-    </div>
-    <div class="flex">
-        <button on:click={() => postQuestion()} class="bg-green-500 hover:bg-green-700 text-white font-bold rounded p-1 m-4">Send Question</button>
-        <button on:click={() => show_form = false} class="bg-red-500 hover:bg-red-700 text-white font-bold rounded p-1 m-4">Cancel</button>
-    </div>
+<div class="bg-coursebg p-1">
+  <h1 class="font-bold m-4">New Question</h1>
+  <div class="m-4 mb-0">
+    <p class="font-bold my-2">Question Title</p>
+    <input class="w-72" type="text" bind:value={question_title}/>
+    <p  class="font-bold my-2">Question Description</p>
+    <textarea class="w-full min-h-[150px]"  bind:value={question_description}></textarea>
   </div>
-{/if}
+  <div class="flex">
+      <button on:click={postQuestion} class="bg-green-500 hover:bg-green-700 text-white font-bold rounded p-1 m-4">Send Question</button>
+      <button on:click={handleCancel} class="bg-red-500 hover:bg-red-700 text-white font-bold rounded p-1 m-4">Cancel</button>
+  </div>
+</div>
