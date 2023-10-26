@@ -11,7 +11,7 @@ const getCourse = async (id) => {
 }
 
 const getQuestions = async (course_id, page) => {
-  const offset = (page - 1) * 20
+  const offset = page * 20
   return await sql`SELECT * FROM questions WHERE course_id = ${course_id} ORDER BY updated_at DESC LIMIT 20 OFFSET ${offset}`
 }
 
@@ -20,7 +20,7 @@ const getQuestion = async (question_id) => {
 }
 
 const getAnswers = async (question_id, page) => {
-  const offset = (page - 1) * 20
+  const offset = page * 20
   return await sql`SELECT * FROM answers WHERE question_id = ${question_id} ORDER BY updated_at DESC LIMIT 20 OFFSET ${offset}`
 }
 
@@ -73,10 +73,8 @@ const addUpvote = async (question_id, answer_id, user) => {
 
 const deleteUpvote = async (question_id, answer_id, user) => {
   if (question_id) {
-    await sql`UPDATE questions SET updated_at = NOW() WHERE question_id = ${question_id}`
     return await sql`DELETE FROM upvotes WHERE question_id = ${question_id} AND user_id = ${user};`
   } else if (answer_id) {
-    await sql`UPDATE answers SET updated_at = NOW() WHERE answer_id = ${answer_id}`
     return await sql`DELETE FROM upvotes WHERE answer_id = ${answer_id} AND user_id = ${user}`
   } else return null
 }

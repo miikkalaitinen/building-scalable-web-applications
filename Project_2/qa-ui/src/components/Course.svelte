@@ -4,11 +4,12 @@
 
   import AddQuestion from "./AddQuestion.svelte";
   import BackButton from "./BackButton.svelte"
+  import InfinteScroller from "./InfiniteScroller.svelte"
 
   export let id;
 
   let course = {}
-  let question_page = 1
+  let question_page = 0
   let webSocket;
   let show_form = false;
 
@@ -23,6 +24,31 @@
       course = await res.json()
       question_page += 1
     }
+  }
+
+  const getQuestions = async () => {
+    const res = await fetch(`/api/courses/${id}/${question_page}`, {
+      method: "GET",
+      headers: {
+        'X-User-Id': $userUuid,
+      },
+    })
+    if (res.status === 200) {
+      const data = await res.json()
+      if (data.length === 0) {
+        return true
+      }
+      question_page += 1
+      course = {
+        ...course,
+        questions: [
+          ...course.questions,
+          ...data,
+        ]
+      }
+      return true
+    }
+    return false
   }
 
   onMount(() => {
@@ -99,6 +125,11 @@
       }
     }
   }
+
+  const dateToString = (date) => {
+    const d = new Date(date)
+    return `${d.getDate()}.${d.getMonth()}.${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`
+  }
 </script>
 
 {#if course.course_name}
@@ -110,39 +141,46 @@
     <p class="mb-2 ml-8 text-lg">{course.course_description}</p> 
   </div>
 
-  <div class="m-5 flex justify-between items-center">
-    <h2 class="text-lg my-5">Questions:</h2>
-    {#if !show_form}
-    <button on:click={() => show_form = true} class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4">Add Question</button>
-    {/if}
-  </div>
-
-  {#if show_form}
-    <AddQuestion course_id={id} closeForm={() => {show_form = false}}/>
-  {/if}
-
-  {#each course.questions as question}
-  <div class="m-5 border-gray-500 border-2">
-    <div class="flex items-center bg-lightblue p-2 ">
-      <a class="flex-auto w-64" href={`/question/${question.question_id}`}>
-        <h1 class="underline text-goodblue">{question.question_title}</h1>
-      </a>
-      <p>{question.upvotes}</p>
-      {#if question.user_upvoted}
-        <button class="mr-4" on:click={() => handleRemoveUpvote(question.question_id)}>
-          <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
-        </button>
-      {:else}
-        <button class="mr-4" on:click={() => handleUpvote(question.question_id)}>
-          <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
-        </button>
+  <div class="px-12">
+    <div class="m-5 flex justify-between items-center">
+      <h2 class="text-lg my-5">Questions:</h2>
+      {#if !show_form}
+      <button on:click={() => show_form = true} class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4">Add Question</button>
       {/if}
     </div>
-    <div>
-      <p class="p-2">{String(question.question_text).length > 60 ? `${String(question.question_text).substring(0,60)}...` : question.question_text}</p>
+
+    {#if show_form}
+      <AddQuestion course_id={id} closeForm={() => {show_form = false}}/>
+    {/if}
+
+    {#each course.questions as question}
+    <div class="m-5 border-gray-500 border-2">
+      <div class="flex items-center bg-lightblue p-2 ">
+        <a class="flex-auto flex justify-between w-64" href={`/question/${question.question_id}`}>
+          <h1 class="underline text-goodblue">{question.question_title}</h1>
+          <div class="pr-10 text-xs">
+            <p>Asked: {dateToString(question.created_at)}</p>
+            <p>Updated: {dateToString(question.updated_at)}</p>
+          </div>
+        </a>
+        <p>{question.upvotes}</p>
+        {#if question.user_upvoted}
+          <button class="mr-4" on:click={() => handleRemoveUpvote(question.question_id)}>
+            <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+          </button>
+        {:else}
+          <button class="mr-4" on:click={() => handleUpvote(question.question_id)}>
+            <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+          </button>
+        {/if}
+      </div>
+      <div>
+        <p class="p-2">{String(question.question_text).length > 60 ? `${String(question.question_text).substring(0,60)}...` : question.question_text}</p>
+      </div>
     </div>
+    {/each}
+    <InfinteScroller onVisible={getQuestions} page={"Questions"}/>
   </div>
-  {/each}
 </div>
 {:else}
   <p>Loading...</p>

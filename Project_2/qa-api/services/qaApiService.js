@@ -17,7 +17,7 @@ const handleGetCourse = async (id, user_id) => {
     return null
   }
   const course = res[0]
-  const questions = await database.getQuestions(course.course_id, 1)
+  const questions = await database.getQuestions(course.course_id, 0)
 
   const questionIds = questions.map((question) => question.question_id)
   const upvotes = await database.getUpvotes(questionIds, null)
@@ -46,13 +46,14 @@ const handleGetCourse = async (id, user_id) => {
 }
 
 const handleGetQuestions = async (id, user_id, page) => {
-  const res = await database.getQuestions(id, page)
+  const res = await database.getCourse(id)
 
   if (!res) {
     return null
   }
 
-  const questions = await database.getQuestions(course.course_id, 1)
+  const course = res[0]
+  const questions = await database.getQuestions(course.course_id, page)
 
   const questionIds = questions.map((question) => question.question_id)
   const upvotes = await database.getUpvotes(questionIds, null)
@@ -84,7 +85,7 @@ const handleGetQuestion = async (id, user_id) => {
     return null
   }
   const question = res[0]
-  const answers = await database.getAnswers(question.question_id, 1)
+  const answers = await database.getAnswers(question.question_id, 0)
 
   const answerIds = answers.map((answer) => answer.answer_id)
   const upvotes = await database.getUpvotes(null, answerIds)
@@ -113,13 +114,14 @@ const handleGetQuestion = async (id, user_id) => {
 }
 
 const handleGetAnswers = async (id, user_id, page) => {
-  const res = await database.getAnswers(id, page)
+  const res = await database.getQuestion(id)
 
   if (!res) {
     return null
   }
 
-  const answers = await database.getAnswers(question.question_id)
+  const question = res[0]
+  const answers = await database.getAnswers(question.question_id, page)
 
   const answerIds = answers.map((answer) => answer.answer_id)
   const upvotes = await database.getUpvotes(null, answerIds)

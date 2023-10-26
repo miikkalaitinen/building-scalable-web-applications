@@ -1,19 +1,6 @@
 import { serve } from './deps.js'
 import * as qaApiService from './services/qaApiService.js'
-
-// const handleRequest = async (request) => {
-//   const data = await request.json();
-
-//   const response = await fetch("http://llm-api:7000/", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(data),
-//   });
-
-//   return response;
-// };
+import { generateAnswers } from './services/mllService.js'
 
 export let sockets = new Set()
 
@@ -46,9 +33,8 @@ const handleGetCourse = async (request, urlPatternResult) => {
 const handleGetQuestions = async (request, urlPatternResult) => {
   try {
     const id = urlPatternResult.pathname.groups.id
+    const page = urlPatternResult.pathname.groups.page
     const userId = await request.headers.get('X-User-Id')
-    const url = new URL(request.url)
-    const page = Number(url.searchParams.get('page'))
     const questions = await qaApiService.handleGetQuestions(id, userId, page)
     return new Response(JSON.stringify(questions), {
       headers: { 'content-type': 'application/json' },
@@ -65,6 +51,21 @@ const handleGetQuestion = async (request, urlPatternResult) => {
     const userId = await request.headers.get('X-User-Id')
     const questions = await qaApiService.handleGetQuestion(id, userId)
     return new Response(JSON.stringify(questions), {
+      headers: { 'content-type': 'application/json' },
+    })
+  } catch (error) {
+    console.log(error)
+    return new Response('Internal server error', { status: 500 })
+  }
+}
+
+const handleGetAnswers = async (request, urlPatternResult) => {
+  try {
+    const id = urlPatternResult.pathname.groups.question_id
+    const page = urlPatternResult.pathname.groups.page
+    const userId = await request.headers.get('X-User-Id')
+    const answers = await qaApiService.handleGetAnswers(id, userId, page)
+    return new Response(JSON.stringify(answers), {
       headers: { 'content-type': 'application/json' },
     })
   } catch (error) {
@@ -98,6 +99,9 @@ const handlePostQuestion = async (request) => {
       question_description,
       userId
     )
+
+    generateAnswers(res.question_id, res.question_text, 3)
+
     if (!res) throw new Error('Something failed, no Error was thrown')
     return new Response('OK', { status: 201 })
   } catch (error) {
@@ -226,8 +230,18 @@ const urlMapping = [
   },
   {
     method: 'GET',
+    pattern: new URLPattern({ pathname: '/courses/:id/:page' }),
+    fn: handleGetQuestions,
+  },
+  {
+    method: 'GET',
     pattern: new URLPattern({ pathname: '/questions/:question_id' }),
     fn: handleGetQuestion,
+  },
+  {
+    method: 'GET',
+    pattern: new URLPattern({ pathname: '/questions/:question_id/:page' }),
+    fn: handleGetAnswers,
   },
   {
     method: 'POST',
