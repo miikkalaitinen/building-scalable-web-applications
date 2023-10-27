@@ -149,28 +149,29 @@
     {#if show_form}
       <AddAnswer class="mr-8" question_id={id} closeForm={() => show_form = false} />
     {/if}
-
-    {#each question.answers as answer}
-      <div class="m-5 border-gray-500 border-2 p-5 flex items-center justify-between">
-        <div class="w-[90%] justify-between">
-          <h1 class="pb-2 mb-2 border-b-2 w-[90%]">Answer posted on {dateToString(answer.created_at)}</h1>
-          <p class="w-[90%]">{answer.answer_text}</p>
+    <div id="answerlist">
+      {#each question.answers as answer}
+        <div class="m-5 border-gray-500 border-2 p-5 flex items-center justify-between">
+          <div class="w-[90%] justify-between">
+            <h1 class="pb-2 mb-2 border-b-2 w-[90%]">Answer posted on {dateToString(answer.created_at)}</h1>
+            <p class="w-[90%]">{answer.answer_text}</p>
+          </div>
+          <div class="w-[10%] flex">
+            <p>{answer.upvotes}</p>
+            {#if answer.user_upvoted}
+              <button on:click={() => handleRemoveUpvote(answer.answer_id)}>
+                <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+              </button>
+            {:else}
+              <button on:click={() => handleUpvote(answer.answer_id)}>
+                <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+              </button>
+            {/if}
         </div>
-        <div class="w-[10%] flex">
-          <p>{answer.upvotes}</p>
-          {#if answer.user_upvoted}
-            <button on:click={() => handleRemoveUpvote(answer.answer_id)}>
-              <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
-            </button>
-          {:else}
-            <button on:click={() => handleUpvote(answer.answer_id)}>
-              <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
-            </button>
-          {/if}
-      </div>
-      </div>
-    {/each}
-    <InfiniteScroller onVisible={getAnswers} page={"Answers"}/>
+        </div>
+      {/each}
+      <InfiniteScroller onVisible={getAnswers} page={"Answers"}/>
+    </div>
   </div>
 </div>
 {:else}

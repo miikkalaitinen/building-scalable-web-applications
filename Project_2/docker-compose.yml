@@ -64,8 +64,6 @@ services:
     command: -connectRetries=60 -baselineOnMigrate=true migrate
     env_file:
       - project.env
-    profiles:
-      - migrate
 
   e2e-playwright:
     entrypoint: '/bin/true'
@@ -81,8 +79,6 @@ services:
       - database
     volumes:
       - ./e2e-playwright/tests:/e2e-playwright/tests
-    profiles:
-      - e2e
 
   redis:
     image: redis:latest

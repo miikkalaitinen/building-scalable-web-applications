@@ -137,7 +137,7 @@
 
   <div class="bg-origin-padding bg-[url('/sisuback.png')] h-64">
     <BackButton />
-    <h1 class="text-4xl p-8 font-semibold">Course: {course.course_name}</h1>
+    <h1 class="text-4xl p-8 font-semibold" id="course-title">Course: {course.course_name}</h1>
     <p class="mb-2 ml-8 text-lg">{course.course_description}</p> 
   </div>
 
@@ -153,33 +153,35 @@
       <AddQuestion course_id={id} closeForm={() => {show_form = false}}/>
     {/if}
 
-    {#each course.questions as question}
-    <div class="m-5 border-gray-500 border-2">
-      <div class="flex items-center bg-lightblue p-2 ">
-        <a class="flex-auto flex justify-between w-64" href={`/question/${question.question_id}`}>
-          <h1 class="underline text-goodblue">{question.question_title}</h1>
-          <div class="pr-10 text-xs">
-            <p>Asked: {dateToString(question.created_at)}</p>
-            <p>Updated: {dateToString(question.updated_at)}</p>
-          </div>
-        </a>
-        <p>{question.upvotes}</p>
-        {#if question.user_upvoted}
-          <button class="mr-4" on:click={() => handleRemoveUpvote(question.question_id)}>
-            <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
-          </button>
-        {:else}
-          <button class="mr-4" on:click={() => handleUpvote(question.question_id)}>
-            <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
-          </button>
-        {/if}
+    <div id="questionlist">
+      {#each course.questions as question}
+      <div class="m-5 border-gray-500 border-2" id={`question-${question.id}`}>
+        <div class="flex items-center bg-lightblue p-2 ">
+          <a class="flex-auto flex justify-between w-64" href={`/question/${question.question_id}`}>
+            <h1 class="underline text-goodblue">{question.question_title}</h1>
+            <div class="pr-10 text-xs">
+              <p>Asked: {dateToString(question.created_at)}</p>
+              <p>Updated: {dateToString(question.updated_at)}</p>
+            </div>
+          </a>
+          <p>{question.upvotes}</p>
+          {#if question.user_upvoted}
+            <button class="mr-4" on:click={() => handleRemoveUpvote(question.question_id)}>
+              <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+            </button>
+          {:else}
+            <button class="mr-4" on:click={() => handleUpvote(question.question_id)}>
+              <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+            </button>
+          {/if}
+        </div>
+        <div>
+          <p class="p-2">{String(question.question_text).length > 60 ? `${String(question.question_text).substring(0,60)}...` : question.question_text}</p>
+        </div>
       </div>
-      <div>
-        <p class="p-2">{String(question.question_text).length > 60 ? `${String(question.question_text).substring(0,60)}...` : question.question_text}</p>
-      </div>
+      {/each}
+      <InfinteScroller onVisible={getQuestions} page={"Questions"}/>
     </div>
-    {/each}
-    <InfinteScroller onVisible={getQuestions} page={"Questions"}/>
   </div>
 </div>
 {:else}

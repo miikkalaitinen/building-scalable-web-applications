@@ -39,7 +39,7 @@
 <div class="bg-coursebg p-1">
   <h1 class="font-bold m-4">New answer</h1>
   <div class="m-4 mb-0">
-    <textarea class="w-full min-h-[150px]" bind:value={answer_text}/>
+    <textarea id="answerarea" class="w-full min-h-[150px]" bind:value={answer_text}/>
   </div>
   <div class="flex">
       <button on:click={postAnswer} class="bg-green-500 hover:bg-green-700 text-white font-bold rounded p-2 m-4">Send Answer</button>

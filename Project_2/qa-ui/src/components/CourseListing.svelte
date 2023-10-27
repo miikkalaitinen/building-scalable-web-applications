@@ -11,7 +11,7 @@
 
 <div>
   <div class="bg-origin-padding bg-[url('/sisuback.png')] h-64">
-    <h1 class="text-4xl p-14 font-semibold">Welcome to Aalto University Q&A site</h1>
+    <h1 class="text-4xl p-14 font-semibold" id="list-title">Welcome to Aalto University Q&A site</h1>
   </div>
   <div class="px-12">
     <h2 class="mb-2 text-xl m-6 font-medium">Courses:</h2>
