@@ -4,3 +4,4 @@ production-database-data/
 **/app-cache
 **/node_modules
 **/**.env
+.qa-uiii
