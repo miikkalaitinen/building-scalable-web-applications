@@ -58,7 +58,7 @@
 
     webSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
+      if (data.data.question_id == id) {
         question = {
           ...question,
           answers: [
@@ -66,6 +66,7 @@
             ...question.answers,
           ]
         }
+      }
     };
 
     return () => {

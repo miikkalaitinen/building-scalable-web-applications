@@ -58,13 +58,14 @@
     webSocket = new WebSocket(`ws://${host}:7800/api/socket/question`);
     webSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
-      course = {
-        ...course,
-        questions: [
-          data.data,
-          ...course.questions,
-        ]}
+      if (data.data.course_id == id) {
+        course = {
+          ...course,
+          questions: [
+            data.data,
+            ...course.questions,
+          ]}
+      }
     };
 
     return () => {
