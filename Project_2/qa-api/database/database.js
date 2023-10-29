@@ -54,11 +54,13 @@ const addQuestion = async (
 }
 
 const addAnswer = async (question_id, answer, user) => {
-  return await sql`
+  const res = await sql`
   INSERT INTO answers (question_id, answer_text, user_id)
   VALUES (${question_id}, ${answer}, ${user})
   RETURNING *;
   `
+  await sql`UPDATE questions SET updated_at = NOW() WHERE question_id = ${question_id}`
+  return res
 }
 
 const addUpvote = async (question_id, answer_id, user) => {
