@@ -83,6 +83,12 @@ services:
   redis:
     image: redis:latest
     command: redis-server /usr/local/etc/redis/redis.conf
+    depends_on:
+      - nginx
+      - qa-api
+      - qa-ui
+      - llm-api
+      - database
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
     expose:
