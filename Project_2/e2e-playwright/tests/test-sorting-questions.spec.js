@@ -11,7 +11,7 @@ test('Questions are sorted correctly after upvote', async ({ page }) => {
   await page.waitForTimeout(500)
   await page.goto('/course/1')
   const firstquestionafter = await page
-    .locator('div[id=questionlist] div >> nth=1')
+    .locator('div[id=questionlist] div >> nth=0')
     .locator('h1')
     .elementHandle() // Get the ElementHandle object
   const firstquestionaftertext = await firstquestionafter.innerText()

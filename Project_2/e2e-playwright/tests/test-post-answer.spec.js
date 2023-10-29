@@ -10,7 +10,7 @@ test('Server accepts new answer and the answer appears without refresh', async (
 
   await page.waitForTimeout(500)
   const firstquestionafter = await page.locator(
-    'div[id=answerlist] div >> nth=1'
+    'div[id=answerlist] div >> nth=0'
   )
   expect(await firstquestionafter.innerText()).toContain('Hola amigos!')
   await page.close()
