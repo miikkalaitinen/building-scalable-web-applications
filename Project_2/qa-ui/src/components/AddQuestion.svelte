@@ -1,5 +1,5 @@
 <script>
-  import { userUuid } from "../stores/stores";
+  import { userUuid } from "../stores/stores.js";
   export let course_id;
   export let closeForm = () => {};
 

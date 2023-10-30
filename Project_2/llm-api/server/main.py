@@ -4,11 +4,11 @@ from .models import generator
 app = FastAPI()
 
 @app.get("/")
-async def main():
+def main():
     return "POST a message with a JSON document that has a 'question' key."
 
 @app.post("/")
-async def ask_question(request: Request):
-    data = await request.json()
+def ask_question(request: Request):
+    data = request.json()
     print("Received question!")
     return generator(data["question"])

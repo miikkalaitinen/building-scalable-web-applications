@@ -1,7 +1,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: visit-counter-app-database-cluster
+  name: qa-app-database-cluster
 spec:
   instances: 2
   storage:

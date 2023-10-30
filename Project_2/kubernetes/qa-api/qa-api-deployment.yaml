@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qa-api-deployment
+  labels:
+    app: qa-api
+spec:
+  selector:
+    matchLabels:
+      app: qa-api
+  template:
+    metadata:
+      labels:
+        app: qa-api
+    spec:
+      containers:
+        - name: qa-api
+          image: qa-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 7777
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          env:
+            - name: PGUSER
+              value: 'username'
+            - name: PGPASSWORD
+              value: 'password'
+            - name: PGHOST
+              value: 'VISIT_COUNTER_APP_DATABASE_CLUSTER_RW_SERVICE_HOST'
+            - name: PGPORT
+              value: 'VISIT_COUNTER_APP_DATABASE_CLUSTER_RW_SERVICE_PORT'
+            - name: PGDATABASE
+              value: 'database'
+            - name: DENO_DIR
+              value: '/app-cache'

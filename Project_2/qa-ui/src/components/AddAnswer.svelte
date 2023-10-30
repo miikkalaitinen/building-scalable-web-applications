@@ -1,5 +1,5 @@
 <script>
-  import { userUuid } from "../stores/stores";
+  import { userUuid } from "../stores/stores.js";
   export let question_id;
   export let closeForm = () => {};
 
