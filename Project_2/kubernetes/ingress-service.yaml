@@ -1,24 +1,39 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: qa-app-ingress
+  name: qa-api
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: nginx
   rules:
     - http:
         paths:
-          - pathType: Prefix
-            path: /api(/|$)(.*)
+          - path: /api(/|$)(.*)
+            pathType: Prefix
             backend:
               service:
                 name: qa-api
                 port:
                   number: 7777
-          - pathType: Prefix
-            path: /(.*)
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qa-ui
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: (/|$)(.*)
+            pathType: Prefix
             backend:
               service:
                 name: qa-ui
                 port:
                   number: 3000
+---
+

@@ -9,7 +9,6 @@ kubectl apply -f redis/statefulset.yaml
 
 ###Database
 kubectl apply -f database/qa-app-database-cluster.yaml
-kubectl apply -f database/qa-app-database-migration-job.yaml
 
 ###LLM
 kubectl apply -f llm-api/llm-api-deployment.yaml
@@ -28,3 +27,7 @@ kubectl apply -f qa-ui/qa-ui-deployment-hpa.yaml
 
 ###Ingress
 kubectl apply -f ingress-service.yaml
+
+
+###Database migration
+kubectl apply -f database/qa-app-database-migration-job.yaml
