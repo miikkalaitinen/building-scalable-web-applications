@@ -1,5 +1,6 @@
 import http from 'k6/http'
 import { check } from 'k6'
+import { ip, port } from './settings.js'
 
 export const options = {
   vus: 10,
@@ -9,7 +10,7 @@ export const options = {
 
 export default function () {
   // Get questions from Python course with many answers
-  const res = http.get('http://localhost:7800/api/questions/31')
+  const res = http.get(`http://${ip}:${port}/api/questions/31`)
   check(res, {
     'status is 200': (r) => r.status === 200,
     'question text is correct': (r) => {

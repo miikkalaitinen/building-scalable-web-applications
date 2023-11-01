@@ -1,6 +1,7 @@
 import http from 'k6/http'
 import ws from 'k6/ws'
 import { check } from 'k6'
+import { ip, port } from './settings.js'
 import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js'
 
 export const options = {
@@ -22,7 +23,7 @@ export default function () {
     },
   }
 
-  ws.connect(`ws://localhost:7800/api/socket/answer`, {}, function (socket) {
+  ws.connect(`ws://${ip}:${port}/api/socket/answer`, {}, function (socket) {
     socket.on('message', function (message) {
       check(message, {
         'message is correct': (m) => {
@@ -36,7 +37,7 @@ export default function () {
       })
       socket.close()
     })
-    const res = http.post('http://localhost:7800/api/answers', payload, params)
+    const res = http.post(`http://${ip}:${port}/api/answers`, payload, params)
     check(res, {
       'status is 201': (r) => r.status === 201,
     })

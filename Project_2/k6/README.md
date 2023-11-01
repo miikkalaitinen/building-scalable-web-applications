@@ -4,4 +4,6 @@ Tests:
 - GET course by id with questions
 - GET questions by id with answers
 - POST answer
-- POST question, how long it takes to generate answers
+- POST upvote
+
+Before running courses input the correct URL to the settings.js file.

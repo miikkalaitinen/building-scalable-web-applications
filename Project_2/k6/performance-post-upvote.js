@@ -1,11 +1,11 @@
 import http from 'k6/http'
-import ws from 'k6/ws'
 import { check } from 'k6'
 import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js'
+import { ip, port } from './settings.js'
 
 export const options = {
   vus: 10,
-  duration: '60s',
+  duration: '30s',
   summaryTrendStats: ['med', 'p(99)'],
 }
 
@@ -20,7 +20,7 @@ export default function () {
       'X-User-Id': user_uuid,
     },
   }
-  const res = http.post('http://localhost:7800/api/upvote', payload, params)
+  const res = http.post(`http://${ip}:${port}/api/upvote`, payload, params)
   check(res, {
     'status is 201': (r) => r.status === 200,
     'response body is correct': (r) => {
