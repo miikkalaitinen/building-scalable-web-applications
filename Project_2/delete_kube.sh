@@ -15,10 +15,6 @@ kubectl delete -f llm-api/llm-api-deployment.yaml
 kubectl delete -f llm-api/llm-api-service.yaml
 kubectl delete -f llm-api/llm-api-deployment-hpa.yaml
 
-kubectl delete -f redis/standard-storageclass.yaml
-kubectl delete -f redis/configmap.yaml
-kubectl delete -f redis/service.yaml
-kubectl delete -f redis/statefulset.yaml
-
-kubectl delete -f database/qa-app-database-cluster.yaml
-kubectl delete -f database/qa-app-database-migration-job.yaml
+kubectl delete -f redis/redis-deployment.yaml
+kubectl delete -f redis/redis-service.yaml
+kubectl delete -f redis/redis-config.yaml

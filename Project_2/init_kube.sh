@@ -15,3 +15,6 @@ cd ../qa-api
 minikube image build -t qa-api -f ./Dockerfile.prod .
 cd ../qa-ui
 minikube image build -t qa-ui -f ./Dockerfile.prod .
+
+cd ../kubernetes
+kubectl apply -f database/qa-app-database-cluster.yaml
