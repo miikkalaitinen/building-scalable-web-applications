@@ -27,14 +27,22 @@ spec:
               memory: 256Mi
           env:
             - name: PGUSER
-              value: 'username'
+              valueFrom:
+                secretKeyRef:
+                  name: qa-app-database-cluster-app
+                  key: username
+                  optional: false
             - name: PGPASSWORD
-              value: 'password'
+              valueFrom:
+                secretKeyRef:
+                  name: qa-app-database-cluster-app
+                  key: password
+                  optional: false
             - name: PGHOST
-              value: 'VISIT_COUNTER_APP_DATABASE_CLUSTER_RW_SERVICE_HOST'
+              value: 'qa-app-database-cluster-rw'
             - name: PGPORT
-              value: 'VISIT_COUNTER_APP_DATABASE_CLUSTER_RW_SERVICE_PORT'
+              value: '5432'
             - name: PGDATABASE
-              value: 'database'
+              value: 'app'
             - name: DENO_DIR
               value: '/app-cache'
