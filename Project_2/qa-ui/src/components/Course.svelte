@@ -55,7 +55,8 @@
     getCourse();
 
     const host = window.location.hostname;
-    webSocket = new WebSocket(`ws://${host}:7800/api/socket/question`);
+    const port = window.location.port;
+    webSocket = new WebSocket(`ws://${host}:${port}/api/socket/question`);
     webSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.data.course_id == id) {

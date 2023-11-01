@@ -54,8 +54,8 @@
     getQuestion();
 
     const host = window.location.hostname;
-    webSocket = new WebSocket(`ws://${host}:7800/api/socket/answer`);
-
+    const port = window.location.port;
+    webSocket = new WebSocket(`ws://${host}:${port}/api/socket/answer`);
     webSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.data.question_id == id) {
