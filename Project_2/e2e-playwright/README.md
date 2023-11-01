@@ -1,6 +1,6 @@
 # Running end to end tests
 
-Run the E2E tests with the following command.
+Run the E2E tests with the following command. Only works with docker compose.
 
 ```
 docker compose run --entrypoint=npx e2e-playwright playwright test && docker compose rm -sf

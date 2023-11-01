@@ -8,8 +8,9 @@ test('Questions are sorted correctly after upvote', async ({ page }) => {
   const fifthquestionbutton = await fifthquestion.locator('img[alt=upvote]')
   await fifthquestionbutton.click()
 
-  await page.waitForTimeout(500)
-  await page.goto('/course/1')
+  await page.waitForTimeout(1000)
+  await page.reload()
+
   const firstquestionafter = await page
     .locator('div[id=questionlist] div >> nth=0')
     .locator('h1')
