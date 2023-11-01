@@ -18,3 +18,6 @@ kubectl delete -f llm-api/llm-api-deployment-hpa.yaml
 kubectl delete -f redis/redis-deployment.yaml
 kubectl delete -f redis/redis-service.yaml
 kubectl delete -f redis/redis-config.yaml
+
+kubectl delete -f prometheus/prometheus_rbac.yaml
+kubectl delete -f prometheus/service_monitor.yaml
