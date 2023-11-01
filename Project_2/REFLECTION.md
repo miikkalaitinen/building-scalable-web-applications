@@ -10,6 +10,10 @@ Deploying the application to docker was quite easy, since I have a lot of experi
 
 All and all this project to a lot of time. That said, I also did learn a ton while doing it. All and all I would have liked the course materials to have a bit more information about how to deploy a fullstack application to kubernetes, as well as how to configure the ingress and routing, since the materials available on the internet are all over the place and the kubernetes documentation is really quite hard to chew on for a beginner.
 
+IMRPOVEMENTS:
+
+The use of redis caching could be improved as explaned in k6/README.md. The frontend could also be improved to work better on mobile devices. If we were deploying the kubernetes application to a real production environment, more thought would be needed when configuring the resources of the containers, as well as the number of replicas e.g. for the llm-api could use replication but also uses a lot of memory.
+
 KNOWN ISSUES:
 
 - If a course or a question is opened from a straight link the back button does not function.

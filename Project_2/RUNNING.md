@@ -10,7 +10,7 @@
 ## For the production mode
 
 1. Have docker running
-2. Run `docker compose -f docker-compose.prod.yml --profile migrate up -d` to run the application and flyway migrations for database.
+2. Run `docker compose -f docker-compose.prod.yml --profile migrate up -d --build` to run the application and flyway migrations for database.
 3. The application should be running on `localhost:7800`, during first run it might take a while for the backend and database to start up.
 4. After the first run, the application can be started with `docker compose -f docker-compose.prod.yml up -d` to start the application without the migrations.
 
@@ -34,6 +34,6 @@ If you run windows you can manually run the commands in the scripts.
 
 Prometheus will be available at `localhost:9090` after running `kubectl port-forward svc/prometheus-operated 9090:9090`
 
-Grafana will be available at `localhost:3000` after running `kubectl expose deployment grafana --port 3000` and `kubectl port-forward svc/grafana 3000:3000`
+Grafana will be available at `localhost:3000` after running and `kubectl port-forward svc/grafana 3000:3000`
 
 Instructions for setting up prometheus to feed data to grafana can be found in article [How to monitor Kubernetes clusters with the Prometheus Operator](https://grafana.com/blog/2023/01/19/how-to-monitor-kubernetes-clusters-with-the-prometheus-operator/)
