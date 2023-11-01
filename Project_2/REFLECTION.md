@@ -8,7 +8,7 @@ The backend, once again it nothing fancy, quite standard get and post calls. I d
 
 Deploying the application to docker was quite easy, since I have a lot of experience using docker thanks to work. However, I had not used kubernetes before this course and I found the course example project quite lacking when it came to to deploy a true fullstack application. I also ran into some errors, such as the llm-apis crashing due to running out of memory when ran in kubernetes, if there was more than one instance running. I also had some hardship with getting the routing inside kube to work, as well as getting an ingress to work so that the applications is accessible from outside the cluster and that the requests to the api are redirectd to the correct service.
 
-All and all this project to a lot of time. That said, I also did learn a lot while doing it. All and all I would have liked the course materials to have a bit more information about how to deploy a fullstack application to kubernetes, as well as how to configure the ingress and routing, since the materials available on the internet are all over the place and the kubernetes documentation is really quite hard to chew on for a beginner.
+All and all this project to a lot of time. That said, I also did learn a ton while doing it. All and all I would have liked the course materials to have a bit more information about how to deploy a fullstack application to kubernetes, as well as how to configure the ingress and routing, since the materials available on the internet are all over the place and the kubernetes documentation is really quite hard to chew on for a beginner.
 
 KNOWN ISSUES:
 
