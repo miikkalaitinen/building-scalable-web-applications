@@ -17,6 +17,7 @@
 ## In Kubernetes with Minikube
 
 1. Run `init_kube.sh`
-2. Apply with `run_kube.sh`
-3. You can now open a tunnel to the nginx service with `minikube service ingress-nginx-controller --url -n ingress-nginx` which will give you the ip for the application.
-4. Delete with `delete_kube.sh`
+2. Run database migrations with `migration.sh`
+3. Apply with `run_kube.sh`
+4. You can now open a tunnel to the nginx service with `minikube service ingress-nginx-controller --url -n ingress-nginx` which will give you the ip for the application.
+5. Delete with `delete_kube.sh`
