@@ -2,7 +2,10 @@ import { createClient } from '../deps.js'
 import { sockets } from '../app.js'
 
 export const subClient = createClient({
-  url: 'redis://redis:6379',
+  socket: {
+    host: 'redis',
+    port: 6379,
+  },
   pingInterval: 1000,
 })
 

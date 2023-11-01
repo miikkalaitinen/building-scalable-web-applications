@@ -1,7 +1,10 @@
 import { createClient } from '../deps.js'
 
 export const pubClient = createClient({
-  url: 'redis://redis:6379',
+  socket: {
+    host: 'redis',
+    port: 6379,
+  },
   pingInterval: 1000,
 })
 
