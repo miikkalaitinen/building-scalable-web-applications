@@ -134,7 +134,7 @@
 
 {#if question.question_title}
 <div>
-  <div class="bg-origin-padding bg-[url('/sisuback.png')] h-64">
+  <div class="bg-origin-padding bg-[url('https://raw.githubusercontent.com/miikkalaitinen/building-scalable-web-applications/master/Project_2/qa-ui/public/sisuback.png')] h-64">
     <BackButton />
     <h1 class="text-4xl p-8 font-semibold">Question: {question.question_title}</h1>
     <p class="mb-2 ml-8 text-lg">{question.question_text}</p>
@@ -161,11 +161,11 @@
             <p>{answer.upvotes}</p>
             {#if answer.user_upvoted}
               <button on:click={() => handleRemoveUpvote(answer.answer_id)}>
-                <img src="/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+                <img src="https://raw.githubusercontent.com/miikkalaitinen/building-scalable-web-applications/master/Project_2/qa-ui/public/upvote_green.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
               </button>
             {:else}
               <button on:click={() => handleUpvote(answer.answer_id)}>
-                <img src="/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
+                <img src="https://raw.githubusercontent.com/miikkalaitinen/building-scalable-web-applications/master/Project_2/qa-ui/public/upvote_black.png" alt="upvote" class="w-6 h-6 mb-1 ml-2 cursor-pointer"/>
               </button>
             {/if}
         </div>

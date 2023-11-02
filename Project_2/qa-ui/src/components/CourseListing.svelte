@@ -10,7 +10,7 @@
 </script>
 
 <div>
-  <div class="bg-origin-padding bg-[url('/sisuback.png')] h-64">
+  <div class="bg-origin-padding bg-[url('https://raw.githubusercontent.com/miikkalaitinen/building-scalable-web-applications/master/Project_2/qa-ui/public/sisuback.png')] h-64">
     <h1 class="text-4xl p-14 font-semibold" id="list-title">Welcome to Aalto University Q&A site</h1>
   </div>
   <div class="px-12">
