@@ -1,11 +1,13 @@
 import { handlePostAnswer } from './qaApiService.js'
 
 const generateAnswers = async (question_id, question_text, amount) => {
+  // Generate answers for a question
   for (let i = 0; i < amount; i++) {
     generateAnswer(question_id, question_text)
   }
 }
 
+// Send then question to the mll-api and generate an answer
 const generateAnswer = async (question_id, question_text) => {
   try {
     const response = await fetch('http://llm-api:7000/', {

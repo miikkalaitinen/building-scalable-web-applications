@@ -11,6 +11,10 @@ export const subClient = createClient({
 })
 
 await subClient.connect()
+
+/* Subscribe to the qa channel, when a message is received, 
+send it to the correct client based on the type and
+add sender to cooldown Set */
 subClient.subscribe('qa', (message, channel) => {
   const msg = JSON.parse(message)
   if (msg.type === 'answer') {
