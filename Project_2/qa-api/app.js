@@ -88,11 +88,6 @@ const handlePostQuestion = async (request) => {
       })
     }
 
-    qaApiService.question_timeouts.add(userId)
-    setTimeout(() => {
-      qaApiService.question_timeouts.delete(userId)
-    }, 60000)
-
     const res = await qaApiService.handlePostQuestion(
       course_id,
       question_title,
@@ -124,11 +119,6 @@ const handlePostAnswer = async (request) => {
         status: 429,
       })
     }
-
-    qaApiService.answer_timeouts.add(userId)
-    setTimeout(() => {
-      qaApiService.answer_timeouts.delete(userId)
-    }, 60000)
 
     const res = await qaApiService.handlePostAnswer(
       question_id,
